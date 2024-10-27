@@ -217,7 +217,7 @@ fn identify_text(text: String, regex_data: &Vec<DataEntry>, _filter: ()) {
             println!("Type: {}", r.name.as_str());
         }
     }
-    println!("Counted {} broken regex patterns.", broken_regex_patterns);
+    println!("Counted {}/{} broken regex patterns.", broken_regex_patterns, regex_data.len());
     // println!("Identifying text: {}", _text);
 }
 
