@@ -1,31 +1,48 @@
-use assert_cmd::prelude::*; // Add methods on commands
-use predicates::prelude::*; // Used for writing assertions
-use std::process::Command; // Run programs
+use assert_cmd::prelude::*;
+use predicates::prelude::*;
+use std::process::Command;
+use assert_fs::prelude::*;
+
 
 #[test]
-fn file_doesnt_exist() -> Result<(), Box<dyn std::error::Error>> {
-    let mut cmd = Command::cargo_bin("What-rs")?;
+fn find_content_in_directory() -> Result<(), Box<dyn std::error::Error>> {
+    let temp_dir = assert_fs::TempDir::new()?;
+    let nested_dir = temp_dir.child("nested/dir");
+    nested_dir.create_dir_all()?;
 
-    cmd.arg("foobar").arg("test/file/doesnt/exist");
+    let file = nested_dir.child("sample.txt");
+    file.write_str("0x52908400098527886E0F7030069857D2E4169EE7")?;
+
+    let mut cmd = Command::cargo_bin("What-rs")?;
+    cmd.arg(temp_dir.path());
     cmd.assert()
-        .failure()
-        .stderr(predicate::str::contains("could not read file"));
+        .success()
+        .stdout(predicate::str::contains("Ethereum (ETH) Wallet Address"));
 
     Ok(())
 }
 
-use assert_fs::prelude::*;
-
 #[test]
 fn find_content_in_file() -> Result<(), Box<dyn std::error::Error>> {
     let file = assert_fs::NamedTempFile::new("sample.txt")?;
-    file.write_str("A test\nActual content\nMore content\nAnother test")?;
+    file.write_str("0x52908400098527886E0F7030069857D2E4169EE7")?;
 
     let mut cmd = Command::cargo_bin("What-rs")?;
-    cmd.arg("test").arg(file.path());
+    cmd.arg("0x52908400098527886E0F7030069857D2E4169EE7");
     cmd.assert()
         .success()
-        .stdout(predicate::str::contains("A test\nAnother test"));
+        .stdout(predicate::str::contains("Ethereum (ETH) Wallet Address"));
+
+    Ok(())
+}
+
+#[test]
+fn find_content_in_text() -> Result<(), Box<dyn std::error::Error>> {
+    let mut cmd = Command::cargo_bin("What-rs")?;
+    cmd.arg("0x52908400098527886E0F7030069857D2E4169EE7");
+    cmd.assert()
+        .success()
+        .stdout(predicate::str::contains("Ethereum (ETH) Wallet Address"));
 
     Ok(())
 }
