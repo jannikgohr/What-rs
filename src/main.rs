@@ -1,7 +1,39 @@
+extern crate regex;
+use regex::{Error, Regex};
 use std::path::Path;
 use anyhow::{Context, Result};
 use clap::{Arg, Command};
-use std::{fs, process};
+use std::{fs, io, process};
+use std::fs::File;
+use std::io::Read;
+use serde::Deserialize;
+
+#[derive(Debug, Deserialize)]
+struct DataEntry {
+    name: String,
+    regex: String,
+    plural_name: bool,
+    description: Option<String>,
+    rarity: f64,
+    url: Option<String>,
+    tags: Option<Vec<String>>,
+    children: Option<ChildrenData>,
+    examples: Option<ExamplesData>,
+}
+
+#[derive(Debug, Deserialize)]
+struct ChildrenData {
+    path: String,
+    entry: String,
+    method: String,
+    deletion_pattern: Option<String>,
+}
+
+#[derive(Debug, Deserialize)]
+struct ExamplesData {
+    valid: Option<Vec<String>>,
+    invalid: Option<Vec<String>>,
+}
 
 fn main() -> Result<()> {
     let matches = Command::new("pyWhat in Rust")
@@ -53,6 +85,9 @@ fn main() -> Result<()> {
         process::exit(0);
     }
 
+    let regex_data = load_regex_pattern_data("data/regex.json")?;
+    // println!("{:#?}", regex.get(0));
+
     let rarity = matches
         .get_one::<String>("rarity")
         .map(|s| parse_rarity(s))
@@ -77,16 +112,16 @@ fn main() -> Result<()> {
         if !matches.get_flag("only_text") && path.exists(){
             // Handle as a file or directory path
             if path.is_file() {
-                identify_file(path, filter)?;
+                identify_file(path, &regex_data, filter)?;
             } else if path.is_dir() {
-                identify_directory(path, filter)?;
+                identify_directory(path, &regex_data, filter)?;
             } else {
                 eprintln!("Input path is not a file or directory");
                 process::exit(1);
             }
         } else {
             // Handle as plain text
-            identify_text(input.to_string(), filter);
+            identify_text(input.to_string(), &regex_data, filter);
         }
     } else {
         eprintln!("Text input or file/directory path expected. Run '--help' for usage.");
@@ -138,30 +173,60 @@ fn create_filter(
     Ok(())
 }
 
-fn identify_file(path: &Path, _filter: ()) -> Result<()> {
+fn identify_file(path: &Path, regex: &Vec<DataEntry>, filter: ()) -> Result<()> {
     // TODO: Better error handling
     println!("Identifying file {:?}", path);
     let content = fs::read_to_string(path)
         .with_context(|| format!("Failed to read file: {:?}", path))?;
-    identify_text(content, _filter);
+    identify_text(content, regex, filter);
     Ok(())
 }
 
-fn identify_directory(path: &Path, _filter: ()) -> Result<()> {
+fn identify_directory(path: &Path, regex: &Vec<DataEntry>, filter: ()) -> Result<()> {
     println!("Identifying directory: {:?}", path);
     for entry in fs::read_dir(path)? {
         let entry = entry?;
         let file_path = entry.path();
         if file_path.is_file() {
-            identify_file(&file_path, _filter)?;
+            identify_file(&file_path, regex, filter)?;
         } else if file_path.is_dir() {
-            identify_directory(&file_path, _filter)?;
+            identify_directory(&file_path, &regex, filter)?;
         }
     }
     Ok(())
 }
 
-fn identify_text(text: String, _filter: ()) {
-    // Placeholder for text identification logic
-    // println!("Identifying text: {}", text);
+fn identify_text(text: String, regex_data: &Vec<DataEntry>, _filter: ()) {
+    let mut broken_regex_patterns = 0;
+    for r in regex_data {
+        let regex_pattern = &r.regex;
+        // Find all matches
+        // println!("Use regex pattern {}", regex_pattern);
+        let re = match Regex::new(&regex_pattern) {
+            Ok(r) => r,
+            Err(error) => {
+                // TODO: Fix broken regex patterns and use other regex crate like fancy-regex
+                broken_regex_patterns += 1;
+                println!("Regex pattern for {} not valid.", r.name);
+                // println!("Error: {}", error);
+                continue
+            },
+        };
+        for mat in re.find_iter(&*text) {
+            println!("Found match: {}", mat.as_str());
+            println!("Type: {}", r.name.as_str());
+        }
+    }
+    println!("Counted {} broken regex patterns.", broken_regex_patterns);
+    // println!("Identifying text: {}", _text);
+}
+
+fn load_regex_pattern_data(file_path: &str) -> Result<Vec<DataEntry>, io::Error> {
+    let mut file = File::open(file_path)?;
+    let mut contents = String::new();
+    file.read_to_string(&mut contents)?;
+
+    // Parse the JSON string into a Vec<DataEntry>
+    let json_data: Vec<DataEntry> = serde_json::from_str(&contents)?;
+    Ok(json_data)
 }
