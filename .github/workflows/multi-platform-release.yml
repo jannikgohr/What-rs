@@ -60,29 +60,41 @@ jobs:
       - name: Copy data directory
         run: cp -r data release/
 
-      - name: Rename binary for consistency
+      - name: Rename binary for consistency (Windows only)
+        if: matrix.os == 'windows-latest'
         run: |
           cd release
-          if [ "${{ matrix.os }}" == "windows-latest" ]; then
-            mv What-rs.exe What-rs
-          fi
+          mv What-rs.exe What-rs
         shell: bash
 
-      - name: Create release archive
+      - name: Create release archive (Windows)
+        if: matrix.os == 'windows-latest'
         run: |
           cd release
-          if [ "${{ matrix.os }}" == "windows-latest" ]; then
-            7z a ../What-rs-${{ github.ref_name }}-windows.zip .
-          else
-            tar -czvf ../What-rs-${{ github.ref_name }}-${{ matrix.os }}.tar.gz .
-          fi
+          7z a ../What-rs-${{ github.ref_name }}-windows.zip .
         shell: bash
 
-      - name: Upload release artifact
+      - name: Create release archive (Linux & macOS)
+        if: matrix.os != 'windows-latest'
+        run: |
+          cd release
+          tar -czvf ../What-rs-${{ github.ref_name }}-${{ matrix.os }}.tar.gz .
+        shell: bash
+
+      - name: Upload release artifact (Windows)
+        if: matrix.os == 'windows-latest'
         uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: |
-            What-rs-${{ github.ref_name }}-${{ matrix.os == 'windows-latest' && 'windows.zip' || matrix.os + '.tar.gz' }}
-          asset_name: What-rs-${{ github.ref_name }}-${{ matrix.os == 'windows-latest' && 'windows.zip' || matrix.os + '.tar.gz' }}
+          asset_path: ./What-rs-${{ github.ref_name }}-windows.zip
+          asset_name: What-rs-${{ github.ref_name }}-windows.zip
+          label: "What-rs for Windows"
+
+      - name: Upload release artifact (Linux & macOS)
+        if: matrix.os != 'windows-latest'
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./What-rs-${{ github.ref_name }}-${{ matrix.os }}.tar.gz
+          asset_name: What-rs-${{ github.ref_name }}-${{ matrix.os }}.tar.gz
           label: "What-rs for ${{ matrix.os }}"
