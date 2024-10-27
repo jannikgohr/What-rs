@@ -34,39 +34,55 @@ jobs:
       - name: Run tests
         run: cargo test --verbose
 
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: What-rs-${{ matrix.os }}
+          path: ${{ matrix.os == 'windows-latest' && 'target/release/What-rs.exe' || 'target/release/What-rs' }}
+
   release:
-    if: github.event_name == 'release'
+    runs-on: ${{ matrix.os }}
     needs: build
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Rust
-        uses: actions-rs/toolchain@v1
+      - name: Download build artifact
+        uses: actions/download-artifact@v3
         with:
-          toolchain: stable
+          name: What-rs-${{ matrix.os }}
+          path: release
 
-      - name: Build for release
-        run: cargo build --release
+      - name: Copy data directory
+        run: cp -r data release/
 
-      - name: Include data directory in release
+      - name: Rename binary for consistency
         run: |
-          mkdir -p release
-          cp -r data release/
-          cp target/release/What-rs release/
+          cd release
+          if [ "${{ matrix.os }}" == "windows-latest" ]; then
+            mv What-rs.exe What-rs
+          fi
+        shell: bash
 
       - name: Create release archive
         run: |
           cd release
-          tar -czvf ../What-rs-${{ github.ref_name }}-${{ matrix.os }}.tar.gz .
+          if [ "${{ matrix.os }}" == "windows-latest" ]; then
+            7z a ../What-rs-${{ github.ref_name }}-windows.zip .
+          else
+            tar -czvf ../What-rs-${{ github.ref_name }}-${{ matrix.os }}.tar.gz .
+          fi
         shell: bash
 
       - name: Upload release artifact
         uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./What-rs-${{ github.ref_name }}-${{ matrix.os }}.tar.gz
-          asset_name: What-rs-${{ github.ref_name }}-${{ matrix.os }}.tar.gz
+          asset_path: |
+            What-rs-${{ github.ref_name }}-${{ matrix.os == 'windows-latest' && 'windows.zip' || matrix.os + '.tar.gz' }}
+          asset_name: What-rs-${{ github.ref_name }}-${{ matrix.os == 'windows-latest' && 'windows.zip' || matrix.os + '.tar.gz' }}
           label: "What-rs for ${{ matrix.os }}"
