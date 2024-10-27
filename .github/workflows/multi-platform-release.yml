@@ -1,0 +1,72 @@
+name: Rust CI/CD
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  release:
+    types: [published]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          components: clippy
+
+      - name: Build the project
+        run: cargo build --release
+
+      - name: Run tests
+        run: cargo test --verbose
+
+  release:
+    if: github.event_name == 'release'
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+
+      - name: Build for release
+        run: cargo build --release
+
+      - name: Include data directory in release
+        run: |
+          mkdir -p release
+          cp -r data release/
+          cp target/release/What-rs release/
+
+      - name: Create release archive
+        run: |
+          cd release
+          tar -czvf ../What-rs-${{ github.ref_name }}-${{ matrix.os }}.tar.gz .
+        shell: bash
+
+      - name: Upload release artifact
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./What-rs-${{ github.ref_name }}-${{ matrix.os }}.tar.gz
+          asset_name: What-rs-${{ github.ref_name }}-${{ matrix.os }}.tar.gz
+          label: "What-rs for ${{ matrix.os }}"
