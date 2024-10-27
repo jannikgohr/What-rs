@@ -1,6 +1,7 @@
+use std::path::Path;
 use anyhow::{Context, Result};
 use clap::{Arg, Command};
-use std::process;
+use std::{fs, process};
 
 fn main() -> Result<()> {
     let matches = Command::new("pyWhat in Rust")
@@ -70,13 +71,27 @@ fn main() -> Result<()> {
         process::exit(1);
     }
 
-    // Placeholder for Distribution, What_Object and Printing objects
-    // Assuming `identify_text` function implements the identification logic.
-    identify_text(
-        text_input.unwrap(),
-        filter,
-        matches.get_flag("only_text"),
-    );
+    // Determine if the input is text or a file/directory path
+    if let Some(input) = matches.get_one::<String>("text_input") {
+        let path = Path::new(input);
+        if !matches.get_flag("only_text") && path.exists(){
+            // Handle as a file or directory path
+            if path.is_file() {
+                identify_file(path, filter)?;
+            } else if path.is_dir() {
+                identify_directory(path, filter)?;
+            } else {
+                eprintln!("Input path is not a file or directory");
+                process::exit(1);
+            }
+        } else {
+            // Handle as plain text
+            identify_text(input.to_string(), filter);
+        }
+    } else {
+        eprintln!("Text input or file/directory path expected. Run '--help' for usage.");
+        process::exit(1);
+    }
 
     Ok(())
 }
@@ -123,10 +138,30 @@ fn create_filter(
     Ok(())
 }
 
-fn identify_text(text: String, _filter: (), only_text: bool) {
-    // Placeholder for text identification logic
-    println!("Identifying text: {}", text);
-    if only_text {
-        println!("Only text mode is enabled.");
+fn identify_file(path: &Path, _filter: ()) -> Result<()> {
+    // TODO: Better error handling
+    println!("Identifying file {:?}", path);
+    let content = fs::read_to_string(path)
+        .with_context(|| format!("Failed to read file: {:?}", path))?;
+    identify_text(content, _filter);
+    Ok(())
+}
+
+fn identify_directory(path: &Path, _filter: ()) -> Result<()> {
+    println!("Identifying directory: {:?}", path);
+    for entry in fs::read_dir(path)? {
+        let entry = entry?;
+        let file_path = entry.path();
+        if file_path.is_file() {
+            identify_file(&file_path, _filter)?;
+        } else if file_path.is_dir() {
+            identify_directory(&file_path, _filter)?;
+        }
     }
+    Ok(())
+}
+
+fn identify_text(text: String, _filter: ()) {
+    // Placeholder for text identification logic
+    // println!("Identifying text: {}", text);
 }
