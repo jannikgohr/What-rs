@@ -1,100 +1,64 @@
-name: Rust CI/CD
+name: build and release
 
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+  workflow_dispatch:
   release:
-    types: [published]
+    types: [ created ]
+
+permissions:
+  contents: write
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.platform.os_name }} with rust ${{ matrix.toolchain }}
+    runs-on: ${{ matrix.platform.os }}
     strategy:
+      fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-
+        platform:
+          - os_name: Linux-aarch64
+            os: ubuntu-20.04
+            target: aarch64-unknown-linux-musl
+            bin: figctl-linux-arm64
+          - os_name: Linux-x86_64
+            os: ubuntu-20.04
+            target: x86_64-unknown-linux-gnu
+            bin: figctl-linux-amd64
+          - os_name: Windows-x86_64
+            os: windows-latest
+            target: x86_64-pc-windows-msvc
+            bin: figctl-amd64.exe
+          - os_name: macOS-x86_64
+            os: macOS-latest
+            target: x86_64-apple-darwin
+            bin: figctl-darwin-amd64
+          - os_name: macOS-aarch64
+            os: macOS-latest
+            target: aarch64-apple-darwin
+            bin: figctl-darwin-arm64
+        toolchain:
+          - stable
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up Rust
-        uses: actions-rs/toolchain@v1
+      - uses: actions/checkout@v3
+      - name: Build binary
+        uses: houseabsolute/actions-rust-cross@v0
         with:
-          toolchain: stable
-          profile: minimal
-          components: clippy
-
-      - name: Build the project
-        run: cargo build --release
-
-      - name: Run tests
-        run: cargo test --verbose
-
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v3
+          command: "build"
+          target: ${{ matrix.platform.target }}
+          toolchain: ${{ matrix.toolchain }}
+          args: "--locked --release"
+          strip: true
+      - name: Rename binary (linux and macos)
+        run: mv target/${{ matrix.platform.target }}/release/figctl target/${{ matrix.platform.target }}/release/${{ matrix.platform.bin }}
+        if: matrix.platform.os_name != 'Windows-x86_64'
+      - name: Rename binary (windows)
+        run: mv target/${{ matrix.platform.target }}/release/figctl.exe target/${{ matrix.platform.target }}/release/${{ matrix.platform.bin }}
+        if: matrix.platform.os_name == 'Windows-x86_64'
+      - name: Generate SHA-256
+        run: shasum -a 256 target/${{ matrix.platform.target }}/release/${{ matrix.platform.bin }} | cut -d ' ' -f 1 > target/${{ matrix.platform.target }}/release/${{ matrix.platform.bin }}.sha256
+      - name: Release binary and SHA-256 checksum to GitHub
+        uses: softprops/action-gh-release@v1
         with:
-          name: What-rs-${{ matrix.os }}
-          path: ${{ matrix.os == 'windows-latest' && 'target/release/What-rs.exe' || 'target/release/What-rs' }}
-
-  release:
-    runs-on: ${{ matrix.os }}
-    needs: build
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Download build artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: What-rs-${{ matrix.os }}
-          path: release
-
-      - name: Copy data directory
-        run: cp -r data release/
-
-      - name: Rename binary for consistency (Windows only)
-        if: matrix.os == 'windows-latest'
-        run: |
-          cd release
-          mv What-rs.exe What-rs
-        shell: bash
-
-      - name: Create release archive (Windows)
-        if: matrix.os == 'windows-latest'
-        run: |
-          cd release
-          7z a ../What-rs-${{ github.ref_name }}-windows.zip .
-        shell: bash
-
-      - name: Create release archive (Linux & macOS)
-        if: matrix.os != 'windows-latest'
-        run: |
-          cd release
-          tar -czvf ../What-rs-${{ github.ref_name }}-${{ matrix.os }}.tar.gz .
-        shell: bash
-
-      - name: Upload release artifact (Windows)
-        if: matrix.os == 'windows-latest'
-        uses: actions/upload-release-asset@v1
-        with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./What-rs-${{ github.ref_name }}-windows.zip
-          asset_name: What-rs-${{ github.ref_name }}-windows.zip
-          label: "What-rs for Windows"
-
-      - name: Upload release artifact (Linux & macOS)
-        if: matrix.os != 'windows-latest'
-        uses: actions/upload-release-asset@v1
-        with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./What-rs-${{ github.ref_name }}-${{ matrix.os }}.tar.gz
-          asset_name: What-rs-${{ github.ref_name }}-${{ matrix.os }}.tar.gz
-          label: "What-rs for ${{ matrix.os }}"
+          files: |
+            target/${{ matrix.platform.target }}/release/${{ matrix.platform.bin }}
+            target/${{ matrix.platform.target }}/release/${{ matrix.platform.bin }}.sha256
