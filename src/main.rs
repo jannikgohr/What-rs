@@ -1,12 +1,12 @@
 extern crate regex;
-use regex::{Error, Regex};
-use std::path::Path;
 use anyhow::{Context, Result};
 use clap::{Arg, Command};
-use std::{fs, io, process};
+use regex::Regex;
+use serde::Deserialize;
 use std::fs::File;
 use std::io::Read;
-use serde::Deserialize;
+use std::path::Path;
+use std::{fs, io, process};
 
 #[derive(Debug, Deserialize)]
 struct DataEntry {
@@ -204,11 +204,11 @@ fn identify_text(text: String, regex_data: &Vec<DataEntry>, _filter: ()) {
         // println!("Use regex pattern {}", regex_pattern);
         let re = match Regex::new(&regex_pattern) {
             Ok(r) => r,
-            Err(error) => {
+            Err(_error) => {
                 // TODO: Fix broken regex patterns and use other regex crate like fancy-regex
                 broken_regex_patterns += 1;
                 println!("Regex pattern for {} not valid.", r.name);
-                // println!("Error: {}", error);
+                // println!("Error: {}", _error);
                 continue
             },
         };
