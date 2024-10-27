@@ -35,6 +35,11 @@ struct ExamplesData {
     invalid: Option<Vec<String>>,
 }
 
+struct Filter {
+    min: f64,
+    max: f64,
+}
+
 fn main() -> Result<()> {
     let matches = Command::new("pyWhat in Rust")
         .version(env!("CARGO_PKG_VERSION"))
@@ -94,11 +99,11 @@ fn main() -> Result<()> {
         .transpose()
         .context("Invalid rarity range format. Expected 'min:max'")?;
 
-    let filter = create_filter(
+    let filter: Filter = create_filter(
         rarity,
         matches.get_one::<String>("include"),
         matches.get_one::<String>("exclude"),
-    )?;
+    );
 
     let text_input = matches.get_one::<String>("text_input").cloned();
     if text_input.is_none() {
@@ -112,16 +117,16 @@ fn main() -> Result<()> {
         if !matches.get_flag("only_text") && path.exists(){
             // Handle as a file or directory path
             if path.is_file() {
-                identify_file(path, &regex_data, filter)?;
+                identify_file(path, &regex_data, &filter)?;
             } else if path.is_dir() {
-                identify_directory(path, &regex_data, filter)?;
+                identify_directory(path, &regex_data, &filter)?;
             } else {
                 eprintln!("Input path is not a file or directory");
                 process::exit(1);
             }
         } else {
             // Handle as plain text
-            identify_text(input.to_string(), &regex_data, filter);
+            identify_text(input.to_string(), &regex_data, &filter);
         }
     } else {
         eprintln!("Text input or file/directory path expected. Run '--help' for usage.");
@@ -137,28 +142,32 @@ fn print_tags() -> Result<()> {
     Ok(())
 }
 
-fn parse_rarity(rarity: &str) -> Result<(f32, f32)> {
+fn parse_rarity(rarity: &str) -> Result<(f64, f64)> {
     let parts: Vec<&str> = rarity.split(':').collect();
     if parts.len() != 2 {
         anyhow::bail!("Invalid rarity format. \
         Format must be 'min:max', where min and max are decimal numbers seperated by a colon.");
     }
-    let min = parts[0].parse::<f32>()?;
-    let max = parts[1].parse::<f32>()?;
-    if min < 0f32 || max > 1f32 {
+    let min = parts[0].parse::<f64>()?;
+    let max = parts[1].parse::<f64>()?;
+    if min < 0f64 || max > 1f64 {
         anyhow::bail!("Invalid rarity range. Range must be between 0 and 1 inclusive.");
     }
     Ok((min, max))
 }
 
 fn create_filter(
-    rarity: Option<(f32, f32)>,
+    rarity: Option<(f64, f64)>,
     include: Option<&String>,
     exclude: Option<&String>,
-) -> Result<()> {
-    // Logic to create a filter based on rarity, include, and exclude values
+) -> Filter {
+    // TODO: Add include and exclude filter
+    let mut filter: Filter = Filter { min: 0f64, max: 1f64 };
+    
     if let Some((min, max)) = rarity {
         println!("Setting rarity filter: min={}, max={}", min, max);
+        filter.min = min;
+        filter.max = max;
     }
 
     if let Some(tags) = include {
@@ -169,11 +178,10 @@ fn create_filter(
         println!("Excluding tags: {:?}", tags.split(',').collect::<Vec<&str>>());
     }
 
-    // Placeholder filter creation
-    Ok(())
+    filter
 }
 
-fn identify_file(path: &Path, regex: &Vec<DataEntry>, filter: ()) -> Result<()> {
+fn identify_file(path: &Path, regex: &Vec<DataEntry>, filter: &Filter) -> Result<()> {
     // TODO: Better error handling
     println!("Identifying file {:?}", path);
     let content = fs::read_to_string(path)
@@ -182,7 +190,7 @@ fn identify_file(path: &Path, regex: &Vec<DataEntry>, filter: ()) -> Result<()> 
     Ok(())
 }
 
-fn identify_directory(path: &Path, regex: &Vec<DataEntry>, filter: ()) -> Result<()> {
+fn identify_directory(path: &Path, regex: &Vec<DataEntry>, filter: &Filter) -> Result<()> {
     println!("Identifying directory: {:?}", path);
     for entry in fs::read_dir(path)? {
         let entry = entry?;
@@ -196,9 +204,13 @@ fn identify_directory(path: &Path, regex: &Vec<DataEntry>, filter: ()) -> Result
     Ok(())
 }
 
-fn identify_text(text: String, regex_data: &Vec<DataEntry>, _filter: ()) {
+fn identify_text(text: String, regex_data: &Vec<DataEntry>, filter: &Filter) {
     let mut broken_regex_patterns = 0;
     for r in regex_data {
+        if r.rarity < filter.min { 
+            
+        }
+        
         let regex_pattern = &r.regex;
         // Find all matches
         // println!("Use regex pattern {}", regex_pattern);
