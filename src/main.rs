@@ -4,7 +4,7 @@ use std::process;
 
 fn main() -> Result<()> {
     let matches = Command::new("pyWhat in Rust")
-        .version("0.1")
+        .version(env!("CARGO_PKG_VERSION"))
         .author("Jannik Gohr <https://github.com/jannikgohr/What-rs>")
         .about("Identify what something is.")
         .arg(
