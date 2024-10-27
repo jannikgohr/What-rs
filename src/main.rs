@@ -219,7 +219,7 @@ fn identify_text(text: String, regex_data: &Vec<DataEntry>, filter: &Filter) {
             Err(_error) => {
                 // TODO: Fix broken regex patterns and use other regex crate like fancy-regex
                 broken_regex_patterns += 1;
-                println!("Regex pattern for {} not valid.", r.name);
+                // println!("Regex pattern for {} not valid.", r.name);
                 // println!("Error: {}", _error);
                 continue
             },
