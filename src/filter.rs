@@ -14,7 +14,6 @@ pub fn create_filter(
     let mut filter: Filter = Filter { min: 0f64, max: 1f64, borderless };
 
     if let Some((min, max)) = rarity {
-        println!("Setting rarity filter: min={}, max={}", min, max);
         filter.min = min;
         filter.max = max;
     }

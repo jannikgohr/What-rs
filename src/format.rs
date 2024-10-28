@@ -1,8 +1,19 @@
-use std::process;
-use fancy_regex::Regex;
-use colored::*;
 use crate::identifier::Match;
 use crate::options::{Options, OutputFormat};
+use colored::*;
+use fancy_regex::Regex;
+use std::process;
+use tabled::{settings::{object::Rows, style::Style, themes::Colorization, Color}, Table, Tabled};
+
+#[derive(Tabled)]
+struct MatchTableRow {
+    #[tabled(rename = "Matched Text")]
+    matched_on: String,
+    #[tabled(rename = "Identified as")]
+    name: String,
+    #[tabled(rename = "Description")]
+    description: String,
+}
 
 pub fn output(matches: &Vec<Match>, options: &Options) {
     match options.format {
@@ -16,8 +27,8 @@ pub fn output(matches: &Vec<Match>, options: &Options) {
 pub fn get_format(format: &Option<&String>) -> OutputFormat {
     match format {
         Some(format) => {
-            let f: &str = format.as_str();
-            match f {
+            let f: String = format.to_uppercase();
+            match f.as_str() {
                 "JSON" => { OutputFormat::JSON },
                 "PRETTY" => { OutputFormat::PRETTY },
                 "DEFAULT" => { OutputFormat::DEFAULT },
@@ -61,15 +72,20 @@ fn c_print_default(matches: &Vec<Match>) {
     }
     let output_text = output.join("");
     display_wikitext(output_text.as_str());
-    //println!("{}", output_text);
 }
 
 fn c_print_json(_matches: &Vec<Match>) {
     panic!("c_print_json: not implemented yet");
 }
 
-fn c_print_pretty(_matches: &Vec<Match>) {
-    panic!("c_print_pretty: not implemented yet");
+fn c_print_pretty(matches: &Vec<Match>) {
+    let rows = matches_to_table_rows(matches);
+    let mut table = Table::new(rows);
+    table
+        .with(Style::modern())
+        .with(Colorization::exact([Color::FG_MAGENTA], Rows::first()));
+    display_wikitext(table.to_string().as_str());
+    //println!("{}", table);
 }
 
 fn c_print_raw(_matches: &Vec<Match>) {
@@ -107,8 +123,9 @@ fn display_wikitext(wikitext: &str) {
             Ok(captures) => {
                 let url = &captures[1];
                 let link_text = &captures[2];
-                let formatted_link = format!("{} ({})", link_text.underline(), url);
-                result = result.replace(&captures[0], &formatted_link);
+                let formatted_link = format!("{} ({}){}", link_text.underline(), url,
+                                             " ".repeat(30));
+                result = result.replace(&captures[0], &formatted_link.to_string());
             }
             Err(e) => {
                 eprintln!("Regex error: {}", e); // Log the error if needed
@@ -117,4 +134,32 @@ fn display_wikitext(wikitext: &str) {
     }
 
     println!("{}", result);
+}
+
+fn matches_to_table_rows(matches: &Vec<Match>) -> Vec<MatchTableRow> {
+    let mut result = Vec::new();
+
+    for m in matches {
+
+        let matched_on = m.matched_on.clone();
+        let name = m.name.clone();
+        let description;
+        if let Some(m_desc) = &m.description {
+            description = m_desc.to_string()
+        } else if let Some(link) = &m.link {
+            let mut desc = String::from("Click here to analyse in the browser\n");
+            desc += link.clone().as_str();
+            desc += &*m.matched_on.as_str().replace(" ", "");
+            description = desc
+        } else {
+            description = String::from("None");
+        }
+        let row: MatchTableRow = MatchTableRow {
+            matched_on,
+            name,
+            description,
+        };
+        result.push(row);
+    }
+    result
 }
