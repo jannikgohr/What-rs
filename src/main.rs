@@ -225,7 +225,7 @@ fn identify_directory(path: &Path, regex: &Vec<PatternData>, filter: &Filter) ->
 
 fn identify_text(text: String, regex_data: &Vec<PatternData>, filter: &Filter) {
     for r in regex_data {
-        if r.rarity < filter.min { 
+        if r.rarity <= filter.min && r.rarity > filter.max {
             continue
         }
         let regex_pattern = match &r.regex_no_anchor {
