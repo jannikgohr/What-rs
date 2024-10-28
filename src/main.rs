@@ -57,8 +57,8 @@ fn main() -> Result<()> {
         .about(env!("CARGO_PKG_DESCRIPTION"))
         .help_template(HELP_TEMPLATE_FORMAT)
         .arg(
-            Arg::new("text_input")
-                .help("Text input to identify")
+            Arg::new("input")
+                .help("Input to identify. Input can be text, a file or directory.")
                 .required(false),
         )
         .arg(
@@ -123,14 +123,14 @@ fn main() -> Result<()> {
         matches.get_one::<String>("exclude"),
     );
 
-    let text_input = matches.get_one::<String>("text_input").cloned();
-    if text_input.is_none() {
+    let input = matches.get_one::<String>("input").cloned();
+    if input.is_none() {
         eprintln!("Text input expected. Run '--help' for usage.");
         process::exit(1);
     }
 
     // Determine if the input is text or a file/directory path
-    if let Some(input) = matches.get_one::<String>("text_input") {
+    if let Some(input) = matches.get_one::<String>("input") {
         let path = Path::new(input);
         if !matches.get_flag("only_text") && path.exists(){
             // Handle as a file or directory path
