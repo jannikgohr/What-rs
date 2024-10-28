@@ -16,7 +16,6 @@ pub struct PatternData {
     pub url: Option<String>,
     pub tags: Option<Vec<String>>,
     pub children: Option<ChildrenData>,
-    pub examples: Option<ExamplesData>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -27,11 +26,6 @@ pub struct ChildrenData {
     pub deletion_pattern: Option<String>,
 }
 
-#[derive(Debug, Deserialize)]
-pub struct ExamplesData {
-    pub valid: Option<Vec<String>>,
-    pub invalid: Option<Vec<String>>,
-}
 
 pub fn load_regex_pattern_data(file_path: &str) -> anyhow::Result<Vec<PatternData>, io::Error> {
     let mut file = File::open(file_path)?;

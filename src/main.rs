@@ -119,7 +119,6 @@ fn main() {
     if let Some(input) = cli.get_one::<String>("input") {
         let mut matches: Vec<Match> = Vec::new();
         identify(input, regex_data, &mut matches, &filter, &options).unwrap();
-        dbg!(&matches);
         output(&matches, &options)
     } else {
         eprintln!("Input as text or file/directory path expected. Run '--help' for usage.");

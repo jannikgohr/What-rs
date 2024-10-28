@@ -1,0 +1,7 @@
+Example (to compare with pyWhat for full output):
+```bash
+pywhat -i "AMEX CC,API Keys,AWS,Amazon,Bitcoin,Bitcoin Cash Wallet,Bitcoin Wallet,Bitly,Bluetooth Address,Braintree,Bug Bounty,CTF Flag,Cloudinary,Coords,Credentials,Credit Card,Cryptocurrency Wallet,DOB,Datadog,Date of Birth,Discord,Discord Bot,Discover CC,Dogecoin,Dogecoin Wallet,Dynatrace,EUI-48,Email,Email Address,Ethereum,Ethereum Wallet,Ethernet Address,Facebook,Finance,Geo-location,GitHub,Google,Google Calendar,Google Cloud,Heroku,IP,IPv4,IPv6,Identifiers,JWT,JWT Token,Lat & Long,License Plate,LinkedIn,Litecoin,Litecoin Wallet,MWS,Mac Address,Mailchimp,Mailgun,Mailing,MasterCard CC,Media,Microsoft,Microsoft Teams,Monero,Monero Wallet,NPM,Nano,Nano Wallet,Networking,New Relic,NuGet,ObjectID,PGP,PayPal,Phone,Phone Number,Picatic,PyPI,Ripple,Ripple Wallet,SSH,SSH Public Key,SSN,SendGrid,Shopify,Slack,Social Security Number,Square,StackHawk,Stripe,TOTP,Timestamp,Token,Tracking,Turkish,Twilio,Twitter,ULID,UNIX,UNIX Timestamp,URL,UUID,Visa CC,Visual Studio,Website,WiFi Address,XRP,YouTube,YouTube Channel,YouTube Video,Zapier,Zoho" -r 0:1 -br 0:1 "0x52908400098527886E0F7030069857D2E4169EE7"
+```
+```bash
+./target/debug/What-rs -r 0:1 "0x52908400098527886E0F7030069857D2E4169EE7"
+```
