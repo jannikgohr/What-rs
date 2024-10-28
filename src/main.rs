@@ -23,6 +23,8 @@ const HELP_TEMPLATE_FORMAT: &str = "\
 {all-args}{after-help}
 ";
 
+const JSON_DATA: &str = include_str!("../data/regex.json");
+
 fn main() {
     setup_panic!();
     let cli = Command::new(env!("CARGO_PKG_NAME"))
@@ -87,7 +89,7 @@ fn main() {
         process::exit(0);
     }
 
-    let regex_data = load_regex_pattern_data("data/regex.json").unwrap();
+    let regex_data = load_regex_pattern_data(JSON_DATA).unwrap();
 
     let rarity = cli
         .get_one::<String>("rarity")

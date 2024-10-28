@@ -1,8 +1,6 @@
-use std::fs::File;
-use std::io;
-use std::io::Read;
 use fancy_regex::Regex;
 use serde::Deserialize;
+use std::io;
 
 #[derive(Debug, Deserialize)]
 pub struct PatternData {
@@ -27,14 +25,9 @@ pub struct ChildrenData {
 }
 
 
-pub fn load_regex_pattern_data(file_path: &str) -> anyhow::Result<Vec<PatternData>, io::Error> {
-    let mut file = File::open(file_path)?;
-    let mut contents = String::new();
-    file.read_to_string(&mut contents)?;
+pub fn load_regex_pattern_data(json_string: &str) -> anyhow::Result<Vec<PatternData>, io::Error> {
 
-    // Parse the JSON string into a Vec<DataEntry>
-    let mut json_data: Vec<PatternData> = serde_json::from_str(&contents)?;
-
+    let mut json_data: Vec<PatternData> = serde_json::from_str(&json_string)?;
 
     for pattern in &mut json_data {
         // Regex to remove `^` not within `[]` or escaped
