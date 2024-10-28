@@ -1,45 +1,16 @@
-use fancy_regex::Regex;
+mod regex_pd;
+mod filter;
+mod identifier;
+
+use crate::identifier::{identify_directory, identify_file, identify_text};
+use crate::regex_pd::load_regex_pattern_data;
 use anyhow::{Context, Result};
 use clap::{Arg, Command};
 use serde::Deserialize;
-use std::fs::File;
 use std::io::Read;
 use std::path::Path;
-use std::{fs, io, process};
-
-#[derive(Debug, Deserialize)]
-struct PatternData {
-    name: String,
-    regex: String,
-    regex_no_anchor : Option<String>,
-    plural_name: bool,
-    description: Option<String>,
-    rarity: f64,
-    url: Option<String>,
-    tags: Option<Vec<String>>,
-    children: Option<ChildrenData>,
-    examples: Option<ExamplesData>,
-}
-
-#[derive(Debug, Deserialize)]
-struct ChildrenData {
-    path: String,
-    entry: String,
-    method: String,
-    deletion_pattern: Option<String>,
-}
-
-#[derive(Debug, Deserialize)]
-struct ExamplesData {
-    valid: Option<Vec<String>>,
-    invalid: Option<Vec<String>>,
-}
-
-struct Filter {
-    min: f64,
-    max: f64,
-    borderless: bool
-}
+use std::process;
+use crate::filter::{create_filter, Filter};
 
 const HELP_TEMPLATE_FORMAT: &str = "\
 {before-help}{name} {version}
@@ -147,7 +118,7 @@ fn main() -> Result<()> {
             identify_text(input.to_string(), &regex_data, &filter);
         }
     } else {
-        eprintln!("Text input or file/directory path expected. Run '--help' for usage.");
+        eprintln!("Input as text or file/directory path expected. Run '--help' for usage.");
         process::exit(1);
     }
 
@@ -156,7 +127,7 @@ fn main() -> Result<()> {
 
 fn print_tags() -> Result<()> {
     println!("Available Tags:");
-    // Code to retrieve and print available tags goes here
+    // TODO: Code to retrieve and print available tags goes here
     Ok(())
 }
 
@@ -174,95 +145,5 @@ fn parse_rarity(rarity: &str) -> Result<(f64, f64)> {
     Ok((min, max))
 }
 
-fn create_filter(
-    rarity: Option<(f64, f64)>,
-    borderless: bool,
-    include: Option<&String>,
-    exclude: Option<&String>,
-) -> Filter {
-    // TODO: Add include and exclude filter
-    let mut filter: Filter = Filter { min: 0f64, max: 1f64, borderless };
-    
-    if let Some((min, max)) = rarity {
-        println!("Setting rarity filter: min={}, max={}", min, max);
-        filter.min = min;
-        filter.max = max;
-    }
-
-    if let Some(tags) = include {
-        println!("Including tags: {:?}", tags.split(',').collect::<Vec<&str>>());
-    }
-
-    if let Some(tags) = exclude {
-        println!("Excluding tags: {:?}", tags.split(',').collect::<Vec<&str>>());
-    }
-
-    filter
-}
-
-fn identify_file(path: &Path, regex: &Vec<PatternData>, filter: &Filter) -> Result<()> {
-    // TODO: Better error handling
-    println!("Identifying file {:?}", path);
-    let content = fs::read_to_string(path)
-        .with_context(|| format!("Failed to read file: {:?}", path))?;
-    identify_text(content, regex, filter);
-    Ok(())
-}
-
-fn identify_directory(path: &Path, regex: &Vec<PatternData>, filter: &Filter) -> Result<()> {
-    println!("Identifying directory: {:?}", path);
-    for entry in fs::read_dir(path)? {
-        let entry = entry?;
-        let file_path = entry.path();
-        if file_path.is_file() {
-            identify_file(&file_path, regex, filter)?;
-        } else if file_path.is_dir() {
-            identify_directory(&file_path, &regex, filter)?;
-        }
-    }
-    Ok(())
-}
-
-fn identify_text(text: String, regex_data: &Vec<PatternData>, filter: &Filter) {
-    for r in regex_data {
-        if r.rarity <= filter.min && r.rarity > filter.max {
-            continue
-        }
-        let regex_pattern = match &r.regex_no_anchor {
-            Some(pattern) if filter.borderless => pattern,
-            _ => &r.regex
-        };
-        // Find all matches
-        let re = Regex::new(&regex_pattern).unwrap();
-        for mat in re.find_iter(&*text) {
-            println!();
-            println!("Found match: {}", mat.unwrap().as_str());
-            println!("Type: {}", r.name.as_str());
-            println!("Using: {}", regex_pattern);
-        }
-    }
-}
-
-fn load_regex_pattern_data(file_path: &str) -> Result<Vec<PatternData>, io::Error> {
-    let mut file = File::open(file_path)?;
-    let mut contents = String::new();
-    file.read_to_string(&mut contents)?;
-
-    // Parse the JSON string into a Vec<DataEntry>
-    let mut json_data: Vec<PatternData> = serde_json::from_str(&contents)?;
 
 
-    for pattern in &mut json_data {
-        // Regex to remove `^` not within `[]` or escaped
-        let re_start = Regex::new(r"(?<!\\)\^(?![^\[\]]*(?<!\\)\])").unwrap();
-        // Regex to remove `$` not within `[]` or escaped
-        let re_end = Regex::new(r"(?<!\\)\$(?![^\[\]]*(?<!\\)\])").unwrap();
-
-        // Apply the regex replacements
-        let regex_no_start_anchor = re_start.replace_all(&pattern.regex, "");
-        let regex_no_anchor = re_end.replace_all(&regex_no_start_anchor, "");
-        pattern.regex_no_anchor = Option::from(regex_no_anchor.to_string());
-    }
-
-    Ok(json_data)
-}
