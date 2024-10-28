@@ -46,3 +46,25 @@ fn find_content_in_text() -> Result<(), Box<dyn std::error::Error>> {
 
     Ok(())
 }
+
+#[test]
+fn find_borderless_content_in_text() -> Result<(), Box<dyn std::error::Error>> {
+    let mut cmd = Command::cargo_bin("What-rs")?;
+    cmd.arg("0x52908400098527886E0F7030069857D2E4169EE7");
+    cmd.assert()
+        .success()
+        .stdout(predicate::str::contains("Turkish Identification Number"));
+
+    Ok(())
+}
+
+#[test]
+fn dont_find_bordered_content_in_text() -> Result<(), Box<dyn std::error::Error>> {
+    let mut cmd = Command::cargo_bin("What-rs")?;
+    cmd.arg("-d").arg("0x52908400098527886E0F7030069857D2E4169EE7");
+    cmd.assert()
+        .success()
+        .stdout(predicate::str::contains("Turkish Identification Number").not());
+
+    Ok(())
+}
