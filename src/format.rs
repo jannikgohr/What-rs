@@ -74,8 +74,9 @@ fn c_print_default(matches: &Vec<Match>) {
     display_wikitext(output_text.as_str());
 }
 
-fn c_print_json(_matches: &Vec<Match>) {
-    panic!("c_print_json: not implemented yet");
+fn c_print_json(matches: &Vec<Match>) {
+    let json_output = serde_json::to_string(matches).unwrap();
+    println!("{}", json_output);
 }
 
 fn c_print_pretty(matches: &Vec<Match>) {

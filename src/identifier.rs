@@ -5,8 +5,9 @@ use anyhow::Context;
 use fancy_regex::Regex;
 use std::path::Path;
 use std::fs;
+use serde::Serialize;
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct Match {
     pub matched_on: String,
     pub name: String,
