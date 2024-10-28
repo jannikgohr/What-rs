@@ -225,7 +225,7 @@
       "regex": "(?i)^(heroku.{0,30}[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12})$",
       "plural_name": false,
       "description": null,
-      "Exploit": "Use the command below to verify that the API key is valid:\n  $ curl -X POST https://api.heroku.com/apps -H \"Accept: application/vnd.heroku+json; version=3\" -H \"Authorization: Bearer API_KEY_HERE\"\n",
+      "exploit": "Use the command below to verify that the API key is valid:\n  $ curl -X POST https://api.heroku.com/apps -H \"Accept: application/vnd.heroku+json; version=3\" -H \"Authorization: Bearer API_KEY_HERE\"\n",
       "rarity": 1,
       "url": null,
       "tags": [
@@ -240,7 +240,7 @@
       "regex": "(?i)^(xox[p|b|o|a]-[0-9]{12}-[0-9]{12}-[0-9]{12}-[a-z0-9]{32})$",
       "plural_name": false,
       "description": null,
-      "Exploit": "Use the command below to verify that the API key is valid:\n  $ curl -sX POST \"https://slack.com/api/auth.test?token=API_KEY_HERE&pretty=1\"\n",
+      "exploit": "Use the command below to verify that the API key is valid:\n  $ curl -sX POST \"https://slack.com/api/auth.test?token=API_KEY_HERE&pretty=1\"\n",
       "rarity": 1,
       "url": null,
       "tags": [
@@ -261,7 +261,7 @@
       "regex": "(?i)^(https://hooks.slack.com/services/T[a-zA-Z0-9_]{8,10}/B[a-zA-Z0-9_]{8,10}/[a-zA-Z0-9_]{24})$",
       "plural_name": false,
       "description": null,
-      "Exploit": "If the command below returns 'missing_text_or_fallback_or_attachments', it means\nthat the URL is valid, any other responses would mean that the URL is invalid.\n  $ curl -s -X POST -H \"Content-type: application/json\" -d '{\"text\":\"\"}' \"SLACK_WEBOOK_URL_HERE\"\n",
+      "exploit": "If the command below returns 'missing_text_or_fallback_or_attachments', it means\nthat the URL is valid, any other responses would mean that the URL is invalid.\n  $ curl -s -X POST -H \"Content-type: application/json\" -d '{\"text\":\"\"}' \"SLACK_WEBOOK_URL_HERE\"\n",
       "rarity": 1,
       "url": null,
       "tags": [
@@ -322,7 +322,7 @@
       "regex": "^(sandbox-?sq0csp-[0-9A-Za-z-_]{43}|sq0[a-z]{3}-[0-9A-Za-z-_]{22,43})$",
       "plural_name": false,
       "description": null,
-      "Exploit": "Use the command below to verify that the secret is valid:\n  $ curl \"https://squareup.com/oauth2/revoke\" -d '{\"access_token\":\"[RANDOM_STRING]\",\"client_id\":\"[APP_ID]\"}'  -H \"Content-Type: application/json\" -H \"Authorization: Client SECRET_HERE\"\n",
+      "exploit": "Use the command below to verify that the secret is valid:\n  $ curl \"https://squareup.com/oauth2/revoke\" -d '{\"access_token\":\"[RANDOM_STRING]\",\"client_id\":\"[APP_ID]\"}'  -H \"Content-Type: application/json\" -H \"Authorization: Client SECRET_HERE\"\n",
       "rarity": 1,
       "url": null,
       "tags": [
@@ -343,7 +343,7 @@
       "regex": "^(sqOatp-[0-9A-Za-z-_]{22}|EAAA[a-zA-Z0-9-_]{60})$",
       "plural_name": false,
       "description": null,
-      "Exploit": "Use the command below to verify that the access token is valid:\n  $ curl https://connect.squareup.com/v2/locations -H \"Authorization: Bearer TOKEN_HERE\"\n",
+      "exploit": "Use the command below to verify that the access token is valid:\n  $ curl https://connect.squareup.com/v2/locations -H \"Authorization: Bearer TOKEN_HERE\"\n",
       "rarity": 1,
       "url": null,
       "tags": [
@@ -364,7 +364,7 @@
       "regex": "^([srp]k_live_[0-9a-zA-Z]{24})$",
       "plural_name": false,
       "description": null,
-      "Exploit": "Use the command below to verify that the API key is valid:\n  $ curl https://api.stripe.com/v1/charges -u \"API_KEY_HERE:\"\n",
+      "exploit": "Use the command below to verify that the API key is valid:\n  $ curl https://api.stripe.com/v1/charges -u \"API_KEY_HERE:\"\n",
       "rarity": 1,
       "url": null,
       "tags": [
@@ -385,7 +385,7 @@
       "regex": "^([a-zA-Z0-9_-]*:[a-zA-Z0-9_-]+@github.com*)$",
       "plural_name": false,
       "description": null,
-      "Exploit": "Use the command below to verify that the access token is valid:\n  $ curl -s -u \"user:TOKEN_HERE\" https://api.github.com/user\n  curl -s -H \"Authorization: token TOKEN_HERE\" \"https://api.github.com/users/[USERNAME]/orgs\"\n . # Check scope of your api token\n $  curl \"https://api.github.com/rate_limit\" -i -u \"user:TOKEN_HERE\" | grep \"X-OAuth-Scopes:\"\n",
+      "exploit": "Use the command below to verify that the access token is valid:\n  $ curl -s -u \"user:TOKEN_HERE\" https://api.github.com/user\n  curl -s -H \"Authorization: token TOKEN_HERE\" \"https://api.github.com/users/[USERNAME]/orgs\"\n . # Check scope of your api token\n $  curl \"https://api.github.com/rate_limit\" -i -u \"user:TOKEN_HERE\" | grep \"X-OAuth-Scopes:\"\n",
       "rarity": 1,
       "url": null,
       "tags": [
@@ -429,7 +429,7 @@
       "regex": "(?i)^((facebook|fb)(.{0,20})?['\\\"][0-9a-f]{32}['\\\"])$",
       "plural_name": false,
       "description": null,
-      "Exploit": "Use the command below to verify that the secret key is valid:\n  $ curl \"https://graph.facebook.com/oauth/access_token?client_id=[ID]&client_secret=SECRET_KEY_HERE&redirect_uri=&grant_type=client_credentials\"\n",
+      "exploit": "Use the command below to verify that the secret key is valid:\n  $ curl \"https://graph.facebook.com/oauth/access_token?client_id=[ID]&client_secret=SECRET_KEY_HERE&redirect_uri=&grant_type=client_credentials\"\n",
       "rarity": 1,
       "url": null,
       "tags": [
@@ -444,7 +444,7 @@
       "regex": "(?i)^((facebook|fb)(.{0,20})?['\\\"][0-9]{13,17}['\\\"])$",
       "plural_name": false,
       "description": null,
-      "Exploit": "Use the command below to verify that the secret key is valid:\n  $ curl \"https://graph.facebook.com/oauth/access_token?client_id=ID_HERE&client_secret=[SECRET_KEY]&redirect_uri=&grant_type=client_credentials\"\n",
+      "exploit": "Use the command below to verify that the secret key is valid:\n  $ curl \"https://graph.facebook.com/oauth/access_token?client_id=ID_HERE&client_secret=[SECRET_KEY]&redirect_uri=&grant_type=client_credentials\"\n",
       "rarity": 1,
       "url": null,
       "tags": [
@@ -457,7 +457,7 @@
       "regex": "(?i)^(twitter(.{0,20})?['\\\"][0-9a-z]{35,44}['\\\"])$",
       "plural_name": false,
       "description": null,
-      "Exploit": "Use the command below to verify that the API key is valid:\n  $ curl -u 'API key:API_KEY_HERE' --data 'grant_type=client_credentials' 'https://api.twitter.com/oauth2/token'\n",
+      "exploit": "Use the command below to verify that the API key is valid:\n  $ curl -u 'API key:API_KEY_HERE' --data 'grant_type=client_credentials' 'https://api.twitter.com/oauth2/token'\n",
       "rarity": 1,
       "url": null,
       "tags": [
@@ -472,7 +472,7 @@
       "regex": "(?i)^(twitter(.{0,20})?['\\\"][0-9a-z]{18,25}['\\\"])$",
       "plural_name": false,
       "description": null,
-      "Exploit": null,
+      "exploit": null,
       "rarity": 1,
       "url": null,
       "tags": [
@@ -485,7 +485,7 @@
       "regex": "^(npm_[0-9a-zA-Z]{36})$",
       "plural_name": false,
       "description": null,
-      "Exploit": null,
+      "exploit": null,
       "rarity": 1,
       "url": null,
       "tags": [
@@ -505,7 +505,7 @@
       "regex": "^(ghp_[0-9a-zA-Z]{36})$",
       "plural_name": false,
       "description": null,
-      "Exploit": "Use the command below to verify that the access token is valid:\n  $ curl -s -u \"user:TOKEN_HERE\" https://api.github.com/user\n  curl -s -H \"Authorization: token TOKEN_HERE\" \"https://api.github.com/users/[USERNAME]/orgs\"\n . # Check scope of your api token\n $  curl \"https://api.github.com/rate_limit\" -i -u \"user:TOKEN_HERE\" | grep \"X-OAuth-Scopes:\"\n",
+      "exploit": "Use the command below to verify that the access token is valid:\n  $ curl -s -u \"user:TOKEN_HERE\" https://api.github.com/user\n  curl -s -H \"Authorization: token TOKEN_HERE\" \"https://api.github.com/users/[USERNAME]/orgs\"\n . # Check scope of your api token\n $  curl \"https://api.github.com/rate_limit\" -i -u \"user:TOKEN_HERE\" | grep \"X-OAuth-Scopes:\"\n",
       "rarity": 1,
       "url": null,
       "tags": [
@@ -526,7 +526,7 @@
       "regex": "^(gho_[0-9a-zA-Z]{36})$",
       "plural_name": false,
       "description": null,
-      "Exploit": "Use the command below to verify that the access token is valid:\n  $ curl -s -u \"user:TOKEN_HERE\" https://api.github.com/user\n  curl -s -H \"Authorization: token TOKEN_HERE\" \"https://api.github.com/users/[USERNAME]/orgs\"\n . # Check scope of your api token\n $  curl \"https://api.github.com/rate_limit\" -i -u \"user:TOKEN_HERE\" | grep \"X-OAuth-Scopes:\"\n",
+      "exploit": "Use the command below to verify that the access token is valid:\n  $ curl -s -u \"user:TOKEN_HERE\" https://api.github.com/user\n  curl -s -H \"Authorization: token TOKEN_HERE\" \"https://api.github.com/users/[USERNAME]/orgs\"\n . # Check scope of your api token\n $  curl \"https://api.github.com/rate_limit\" -i -u \"user:TOKEN_HERE\" | grep \"X-OAuth-Scopes:\"\n",
       "rarity": 1,
       "url": null,
       "tags": [
@@ -547,7 +547,7 @@
       "regex": "^((ghu|ghs)_[0-9a-zA-Z]{36})$",
       "plural_name": false,
       "description": null,
-      "Exploit": "Use the command below to verify that the app token is valid:\n  $ curl -s -u \"user:TOKEN_HERE\" https://api.github.com/user\n  curl -s -H \"Authorization: token TOKEN_HERE\" \"https://api.github.com/users/[USERNAME]/orgs\"\n . # Check scope of your api token\n $  curl \"https://api.github.com/rate_limit\" -i -u \"user:TOKEN_HERE\" | grep \"X-OAuth-Scopes:\"\n",
+      "exploit": "Use the command below to verify that the app token is valid:\n  $ curl -s -u \"user:TOKEN_HERE\" https://api.github.com/user\n  curl -s -H \"Authorization: token TOKEN_HERE\" \"https://api.github.com/users/[USERNAME]/orgs\"\n . # Check scope of your api token\n $  curl \"https://api.github.com/rate_limit\" -i -u \"user:TOKEN_HERE\" | grep \"X-OAuth-Scopes:\"\n",
       "rarity": 1,
       "url": null,
       "tags": [
@@ -568,7 +568,7 @@
       "regex": "^(ghr_[0-9a-zA-Z]+)$",
       "plural_name": false,
       "description": null,
-      "Exploit": null,
+      "exploit": null,
       "rarity": 1,
       "url": null,
       "tags": [
@@ -589,7 +589,7 @@
       "regex": "(?i)^((linkedin(.{0,20})?[0-9a-z]{12}))$",
       "plural_name": false,
       "description": null,
-      "Exploit": null,
+      "exploit": null,
       "rarity": 1,
       "url": null,
       "tags": [
@@ -602,7 +602,7 @@
       "regex": "(?i)^(linkedin(.{0,20})?[0-9a-z]{16})$",
       "plural_name": false,
       "description": null,
-      "Exploit": null,
+      "exploit": null,
       "rarity": 1,
       "url": null,
       "tags": [
@@ -617,7 +617,7 @@
       "regex": "(?i)^(rk_live_[0-9a-zA-Z]{24})$",
       "plural_name": false,
       "description": null,
-      "Exploit": null,
+      "exploit": null,
       "rarity": 1,
       "url": null,
       "tags": [
@@ -632,7 +632,7 @@
       "regex": "(?i)^(sk_live_[0-9a-zA-Z]{24})$",
       "plural_name": false,
       "description": null,
-      "Exploit": "Use the command below to verify that the Stripe Standard Live API Token is valid.\n  $ curl https://api.stripe.com/v1/charges -u TOKEN_HERE:\n\nKeep the colon at the end of the token to prevent cURL from requesting a password.\n\nThe live key can be used to extract/retrieve a lot of info ranging from the charges\nto the complete product list.\n\nKeep in mind that you will never be able to get the full credit card information since\nStripe only gives you the last 4 digits.\n",
+      "exploit": "Use the command below to verify that the Stripe Standard Live API Token is valid.\n  $ curl https://api.stripe.com/v1/charges -u TOKEN_HERE:\n\nKeep the colon at the end of the token to prevent cURL from requesting a password.\n\nThe live key can be used to extract/retrieve a lot of info ranging from the charges\nto the complete product list.\n\nKeep in mind that you will never be able to get the full credit card information since\nStripe only gives you the last 4 digits.\n",
       "rarity": 1,
       "url": null,
       "tags": [
@@ -647,7 +647,7 @@
       "regex": "(?i)^(sq0csp-[ 0-9A-Za-z\\-_]{43})$",
       "plural_name": false,
       "description": null,
-      "Exploit": "Use the command below to verify that the token is valid:\n  $ curl \"https://squareup.com/oauth2/revoke\" -d '{\"access_token\":\"[RANDOM_STRING]\",\"client_id\":\"[APP_ID]\"}'  -H \"Content-Type: application/json\" -H \"Authorization: Client TOKEN_HERE\"\n",
+      "exploit": "Use the command below to verify that the token is valid:\n  $ curl \"https://squareup.com/oauth2/revoke\" -d '{\"access_token\":\"[RANDOM_STRING]\",\"client_id\":\"[APP_ID]\"}'  -H \"Content-Type: application/json\" -H \"Authorization: Client TOKEN_HERE\"\n",
       "rarity": 1,
       "url": null,
       "tags": [
@@ -662,7 +662,7 @@
       "regex": "(?i)^(access_token\\$production\\$[0-9a-z]{16}\\$[0-9a-f]{32})$",
       "plural_name": false,
       "description": null,
-      "Exploit": null,
+      "exploit": null,
       "rarity": 1,
       "url": null,
       "tags": [
@@ -678,7 +678,7 @@
       "regex": "(?i)^(amzn\\.mws\\.[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$",
       "plural_name": false,
       "description": null,
-      "Exploit": null,
+      "exploit": null,
       "rarity": 1,
       "url": null,
       "tags": [
@@ -694,7 +694,7 @@
       "regex": "(?i)^(sk_[live|test]_[0-9a-z]{32})$",
       "plural_name": false,
       "description": null,
-      "Exploit": null,
+      "exploit": null,
       "rarity": 1,
       "url": null,
       "tags": [
@@ -709,7 +709,7 @@
       "regex": "(?i)^(ya29\\.[0-9A-Za-z\\-_]{64})$",
       "plural_name": false,
       "description": null,
-      "Exploit": null,
+      "exploit": null,
       "rarity": 1,
       "url": null,
       "tags": [
@@ -724,7 +724,7 @@
       "regex": "(?i)^([0-9]+\\-[0-9A-Z_]+\\.apps\\.googleusercontent\\.com)$",
       "plural_name": false,
       "description": null,
-      "Exploit": null,
+      "exploit": null,
       "rarity": 1,
       "url": null,
       "tags": [
@@ -747,7 +747,7 @@
       "regex": "(?i)^(hawk\\.[0-9A-Za-z\\-_]{20}\\.[0-9A-Za-z\\-_]{20})$",
       "plural_name": false,
       "description": null,
-      "Exploit": null,
+      "exploit": null,
       "rarity": 1,
       "url": null,
       "tags": [
@@ -768,7 +768,7 @@
       "regex": "(?i)^(oy2[a-z0-9]{43})$",
       "plural_name": false,
       "description": null,
-      "Exploit": null,
+      "exploit": null,
       "rarity": 1,
       "url": null,
       "tags": [
@@ -783,7 +783,7 @@
       "regex": "(?i)^(SG\\.[0-9A-Za-z\\-_]{22}\\.[0-9A-Za-z-_]{43})$",
       "plural_name": false,
       "description": null,
-      "Exploit": "Use the command below to verify that the SendGrid Token is valid.\n  $ curl -X \"GET\" \"https://api.sendgrid.com/v3/scopes\" -H \"Authorization: Bearer SENDGRID_TOKEN_HERE\" -H \"Content-Type: application/json\"\n",
+      "exploit": "Use the command below to verify that the SendGrid Token is valid.\n  $ curl -X \"GET\" \"https://api.sendgrid.com/v3/scopes\" -H \"Authorization: Bearer SENDGRID_TOKEN_HERE\" -H \"Content-Type: application/json\"\n",
       "rarity": 1,
       "url": null,
       "tags": [
@@ -798,7 +798,7 @@
       "regex": "(?i)^(https://creator\\.zoho\\.com/api/[A-Za-z0-9/\\-_\\.]+\\?authtoken=[A-Za-z0-9]+)$",
       "plural_name": false,
       "description": null,
-      "Exploit": null,
+      "exploit": null,
       "rarity": 1,
       "url": null,
       "tags": [
@@ -811,7 +811,7 @@
       "regex": "(?i)^(https://(?:www.)?hooks\\.zapier\\.com/hooks/catch/[A-Za-z0-9]+/[A-Za-z0-9]+/)$",
       "plural_name": false,
       "description": null,
-      "Exploit": "Verify that the Zapier Webook url is valid:\n  curl -H \"Accept: application/json\" -H \"Content-Type: application/json\" -X POST -d '{\"name\":\"PyWhat\"}' \"WEBHOOK_URL_HERE\"\n",
+      "exploit": "Verify that the Zapier Webook url is valid:\n  curl -H \"Accept: application/json\" -H \"Content-Type: application/json\" -X POST -d '{\"name\":\"PyWhat\"}' \"WEBHOOK_URL_HERE\"\n",
       "rarity": 1,
       "url": null,
       "tags": [
@@ -832,7 +832,7 @@
       "regex": "(?i)^(NRAA-[a-f0-9]{27})$",
       "plural_name": false,
       "description": null,
-      "Exploit": "Use the command below to verify that API key is valid:\n  $ curl -X POST https://api.newrelic.com/graphql -H 'Content-Type: application/json' -H 'API-Key: API_KEY_HERE' -d '{ \"query\": \"{ requestContext { userId apiKey } }\" } '\n",
+      "exploit": "Use the command below to verify that API key is valid:\n  $ curl -X POST https://api.newrelic.com/graphql -H 'Content-Type: application/json' -H 'API-Key: API_KEY_HERE' -d '{ \"query\": \"{ requestContext { userId apiKey } }\" } '\n",
       "rarity": 1,
       "url": null,
       "tags": [
@@ -847,7 +847,7 @@
       "regex": "(?i)^(NRI(?:I|Q)-[A-Za-z0-9\\-_]{32})$",
       "plural_name": false,
       "description": null,
-      "Exploit": null,
+      "exploit": null,
       "rarity": 1,
       "url": null,
       "tags": [
@@ -862,7 +862,7 @@
       "regex": "(?i)^(NRRA-[a-f0-9]{42})$",
       "plural_name": false,
       "description": null,
-      "Exploit": "Use the command below to verify that the New Relic REST API Key is valid.\n  $ curl -X GET 'https://api.newrelic.com/v2/applications.json' -H \"X-Api-Key:${API_KEY_HERE}\" -i\n\nIf valid, test furher to see if its an admin key (https://docs.newrelic.com/docs/apis/intro-apis/new-relic-api-keys/)\n",
+      "exploit": "Use the command below to verify that the New Relic REST API Key is valid.\n  $ curl -X GET 'https://api.newrelic.com/v2/applications.json' -H \"X-Api-Key:${API_KEY_HERE}\" -i\n\nIf valid, test furher to see if its an admin key (https://docs.newrelic.com/docs/apis/intro-apis/new-relic-api-keys/)\n",
       "rarity": 1,
       "url": null,
       "tags": [
@@ -883,7 +883,7 @@
       "regex": "(?i)^(NRSP-[a-z]{2}[0-9]{2}[a-f0-9]{31})$",
       "plural_name": false,
       "description": null,
-      "Exploit": null,
+      "exploit": null,
       "rarity": 1,
       "url": null,
       "tags": [
@@ -902,7 +902,7 @@
       "regex": "(?i)^(NRAK-[a-z0-9]{27})$",
       "plural_name": false,
       "description": null,
-      "Exploit": "Use the command below to verify that API key is valid:\n  $ curl -X POST https://api.newrelic.com/graphql -H 'Content-Type: application/json' -H 'API-Key: API_KEY_HERE' -d '{ \"query\": \"{ requestContext { userId apiKey } }\" } '\n",
+      "exploit": "Use the command below to verify that API key is valid:\n  $ curl -X POST https://api.newrelic.com/graphql -H 'Content-Type: application/json' -H 'API-Key: API_KEY_HERE' -d '{ \"query\": \"{ requestContext { userId apiKey } }\" } '\n",
       "rarity": 1,
       "url": null,
       "tags": [
@@ -923,7 +923,7 @@
       "regex": "(?i)^(https://outlook\\.office\\.com/webhook/[A-Za-z0-9\\-@]{64}/IncomingWebhook/[A-Za-z0-9\\-]{64}/[A-Za-z0-9\\-]{64})$",
       "plural_name": false,
       "description": null,
-      "Exploit": null,
+      "exploit": null,
       "rarity": 1,
       "url": null,
       "tags": [
@@ -938,7 +938,7 @@
       "regex": "(?i)^(AAAA[a-zA-Z0-9_-]{7}:[a-zA-Z0-9_-]{140})$",
       "plural_name": false,
       "description": null,
-      "Exploit": null,
+      "exploit": null,
       "rarity": 1,
       "url": null,
       "tags": [
@@ -951,7 +951,7 @@
       "regex": "(?i)^(https://calendar.google.com/calendar/embed\\?src=[A-Za-z0-9%@&;=\\-_\\./]+)$",
       "plural_name": false,
       "description": null,
-      "Exploit": null,
+      "exploit": null,
       "rarity": 1,
       "url": null,
       "tags": [
@@ -972,7 +972,7 @@
       "regex": "(?i)^(https?:\\/\\/(?:ptb\\.|canary\\.)?discord(?:app)?\\.com\\/api(?:\\/v\\d{1,2})?\\/webhooks\\/(\\d{17,19})\\/([\\w-]{68}))$",
       "plural_name": false,
       "description": null,
-      "Exploit": null,
+      "exploit": null,
       "rarity": 1,
       "url": null,
       "tags": [
@@ -1040,7 +1040,7 @@
       "regex": "(?i)^(cloudinary://[0-9]+:[A-Za-z0-9-_.]+@[A-Za-z0-9-_.]+)$",
       "plural_name": false,
       "description": null,
-      "Exploit": null,
+      "exploit": null,
       "rarity": 1,
       "url": null,
       "tags": [
@@ -1054,7 +1054,7 @@
       "regex": "(?i)^(pypi-AgEIcHlwaS5vcmc[A-Za-z0-9-_]+)$",
       "plural_name": false,
       "description": null,
-      "Exploit": "Anyone with this token is able to upload to the PyPI for the package that belongs to this token.\n",
+      "exploit": "Anyone with this token is able to upload to the PyPI for the package that belongs to this token.\n",
       "rarity": 1,
       "url": null,
       "tags": [
@@ -1075,7 +1075,7 @@
       "regex": "(?i)^(shppa_[a-fA-F0-9]{32})$",
       "plural_name": false,
       "description": null,
-      "Exploit": null,
+      "exploit": null,
       "rarity": 1,
       "url": null,
       "tags": [
@@ -1090,7 +1090,7 @@
       "regex": "(?i)^(shpca_[a-fA-F0-9]{32})$",
       "plural_name": false,
       "description": null,
-      "Exploit": null,
+      "exploit": null,
       "rarity": 1,
       "url": null,
       "tags": [
@@ -1105,7 +1105,7 @@
       "regex": "(?i)^(shpat_[a-fA-F0-9]{32})$",
       "plural_name": false,
       "description": null,
-      "Exploit": null,
+      "exploit": null,
       "rarity": 1,
       "url": null,
       "tags": [
@@ -1120,7 +1120,7 @@
       "regex": "(?i)^(shpss_[a-fA-F0-9]{32})$",
       "plural_name": false,
       "description": null,
-      "Exploit": null,
+      "exploit": null,
       "rarity": 1,
       "url": null,
       "tags": [
@@ -1135,7 +1135,7 @@
       "regex": "(?i)^(dt0[a-zA-Z]{1}[0-9]{2}\\.[A-Z0-9]{24}\\.[A-Z0-9]{64})$",
       "plural_name": false,
       "description": null,
-      "Exploit": null,
+      "exploit": null,
       "rarity": 1,
       "url": null,
       "tags": [
@@ -1150,7 +1150,7 @@
       "regex": "(?i)^((arn:aws:sns:)[a-z0-9-]+:[0-9]+:[A-Za-z0-9-_]{1,128})$",
       "plural_name": false,
       "description": null,
-      "Exploit": null,
+      "exploit": null,
       "rarity": 1,
       "url": null,
       "tags": [
@@ -1303,7 +1303,7 @@
       "regex": "(?i)^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})$",
       "plural_name": false,
       "description": null,
-      "Exploit": null,
+      "exploit": null,
       "rarity": 0.8,
       "url": null,
       "tags": [
@@ -1319,7 +1319,7 @@
       "regex": "(?i)^([0-9a-f]{32}-us[0-9]{1,2})$",
       "plural_name": false,
       "description": null,
-      "Exploit": "Use the command below to verify that the API key is valid (substitute <dc> for your datacenter, i. e. us5):\n  $ curl --request GET --url 'https://<dc>.api.mailchimp.com/3.0/' --user 'anystring:API_KEY_HERE' --include\n",
+      "exploit": "Use the command below to verify that the API key is valid (substitute <dc> for your datacenter, i. e. us5):\n  $ curl --request GET --url 'https://<dc>.api.mailchimp.com/3.0/' --user 'anystring:API_KEY_HERE' --include\n",
       "rarity": 0.8,
       "url": null,
       "tags": [
@@ -1688,7 +1688,7 @@
       "regex": "^([0-9a-f]{40})$",
       "plural_name": false,
       "description": null,
-      "Exploit": "Use the command below to verify that the secret key is valid:\n  $ curl \"https://api-ssl.bitly.com/v3/shorten?access_token=SECRET_KEY_HERE&longUrl=https://www.google.com\"\n",
+      "exploit": "Use the command below to verify that the secret key is valid:\n  $ curl \"https://api-ssl.bitly.com/v3/shorten?access_token=SECRET_KEY_HERE&longUrl=https://www.google.com\"\n",
       "rarity": 0.5,
       "url": null,
       "tags": [
@@ -1710,7 +1710,7 @@
       "plural_name": false,
       "description": null,
       "rarity": 0.5,
-      "Exploit": null,
+      "exploit": null,
       "url": null,
       "tags": [
          "Identifiers",
@@ -2207,7 +2207,7 @@
       "regex": "^(xox[a-zA-Z]-[a-zA-Z0-9-]+)$",
       "plural_name": false,
       "description": null,
-      "Exploit": "Use the command below to verify that private key is valid:\n  $ curl -sX POST \"https://slack.com/api/auth.test?token=TOKEN_HERE&pretty=1\"\n",
+      "exploit": "Use the command below to verify that private key is valid:\n  $ curl -sX POST \"https://slack.com/api/auth.test?token=TOKEN_HERE&pretty=1\"\n",
       "rarity": 0.3,
       "url": null,
       "tags": [
@@ -2247,7 +2247,7 @@
       "regex": "^(AIza[0-9A-Za-z-_]{35})$",
       "plural_name": false,
       "description": null,
-      "Exploit": "There is a change this could be a Google Maps API key, so could try using 'gmapapiscanner'[1] or 'gap'[2]\nto check which Google Maps service it is valid for and generate a PoC that you can show in your report. To\nget a better understanding on the severity of having the Google Maps API key exposed, make sure to to to\nread \"Unauthorized Google Maps API Key Usage Cases, and Why You Need to Care\"[3] written by Ozgur Alp (@ozguralp)\n\nReferences:\n [1] https://github.com/ozguralp/gmapsapiscanner\n [2] https://github.com/joanbono/gap\n [3] https://ozguralp.medium.com/unauthorized-google-maps-api-key-usage-cases-and-why-you-need-to-care-1ccb28bf21e\n\nAPI Documentation: https://developers.google.com/maps/documentation/javascript/get-api-key",
+      "exploit": "There is a change this could be a Google Maps API key, so could try using 'gmapapiscanner'[1] or 'gap'[2]\nto check which Google Maps service it is valid for and generate a PoC that you can show in your report. To\nget a better understanding on the severity of having the Google Maps API key exposed, make sure to to to\nread \"Unauthorized Google Maps API Key Usage Cases, and Why You Need to Care\"[3] written by Ozgur Alp (@ozguralp)\n\nReferences:\n [1] https://github.com/ozguralp/gmapsapiscanner\n [2] https://github.com/joanbono/gap\n [3] https://ozguralp.medium.com/unauthorized-google-maps-api-key-usage-cases-and-why-you-need-to-care-1ccb28bf21e\n\nAPI Documentation: https://developers.google.com/maps/documentation/javascript/get-api-key",
       "rarity": 0.3,
       "url": null,
       "tags": [
@@ -2288,7 +2288,7 @@
       "regex": "^(key-[0-9a-zA-Z]{32})$",
       "plural_name": false,
       "description": null,
-      "Exploit": "Use the command below to verify that private key is valid:\n  $ curl --user 'api:key-PRIVATE_KEY_HERE' \"https://api.mailgun.net/v3/domains\"\n",
+      "exploit": "Use the command below to verify that private key is valid:\n  $ curl --user 'api:key-PRIVATE_KEY_HERE' \"https://api.mailgun.net/v3/domains\"\n",
       "rarity": 0.3,
       "url": null,
       "tags": [
@@ -2309,7 +2309,7 @@
       "regex": "^(SK[0-9a-fA-F]{32})$",
       "plural_name": false,
       "description": null,
-      "Exploit": "Use the command below to verify that API key is valid:\n  $ curl -X GET 'https://api.twilio.com/2010-04-01/Accounts.json' -u [ACCOUNT_SID]:AUTH_TOKEN_HERE\n",
+      "exploit": "Use the command below to verify that API key is valid:\n  $ curl -X GET 'https://api.twilio.com/2010-04-01/Accounts.json' -u [ACCOUNT_SID]:AUTH_TOKEN_HERE\n",
       "rarity": 0.3,
       "url": null,
       "tags": [
@@ -2330,7 +2330,7 @@
       "regex": "^(AC[a-zA-Z0-9_-]{32})$",
       "plural_name": false,
       "description": null,
-      "Exploit": "Use the command below to verify that the SID is valid:\n  $ curl -X GET 'https://api.twilio.com/2010-04-01/Accounts.json' -u ACCOUNT_SID_HERE:[AUTH_TOKEN]\n",
+      "exploit": "Use the command below to verify that the SID is valid:\n  $ curl -X GET 'https://api.twilio.com/2010-04-01/Accounts.json' -u ACCOUNT_SID_HERE:[AUTH_TOKEN]\n",
       "rarity": 0.3,
       "url": null,
       "tags": [
@@ -2369,7 +2369,7 @@
       "regex": "^(6L[0-9A-Za-z-_]{38}|6[0-9a-zA-Z_-]{39})$",
       "plural_name": false,
       "description": null,
-      "Exploit": "Use the command below to verify that API key is valid:\n  $ curl -X POST -d \"secret=API_KEY_HERE&response=RESPONSE_TO_VERIFY\" https://www.google.com/recaptcha/api/siteverify\n",
+      "exploit": "Use the command below to verify that API key is valid:\n  $ curl -X POST -d \"secret=API_KEY_HERE&response=RESPONSE_TO_VERIFY\" https://www.google.com/recaptcha/api/siteverify\n",
       "rarity": 0.3,
       "url": null,
       "tags": [
@@ -2408,7 +2408,7 @@
       "regex": "^([0-9]{6,}\\|[A-Za-z0-9\\-]{24,})$",
       "plural_name": false,
       "description": null,
-      "Exploit": null,
+      "exploit": null,
       "rarity": 0.3,
       "url": "https://developers.facebook.com/tools/debug/accesstoken/?access_token=",
       "tags": [
@@ -2430,7 +2430,7 @@
       "regex": "^(pub[a-f0-9]{32})$",
       "plural_name": false,
       "description": null,
-      "Exploit": null,
+      "exploit": null,
       "rarity": 0.3,
       "url": null,
       "tags": [
@@ -2477,7 +2477,7 @@
       "regex": "^((?<![A-Z0-9])[A-Z0-9]{20}(?![A-Z0-9]))$",
       "plural_name": false,
       "description": null,
-      "Exploit": "Install awscli (https://aws.amazon.com/cli/), set the access key and secret to environment variables, and execute the following command: $ AWS_ACCESS_KEY_ID=ACCESS_KEY_HERE AWS_SECRET_ACCESS_KEY=[SECRET_KEY] aws sts get-caller-identity\n AWS credentials' permissions can be determined using enumerate-IAM (https://github.com/andresriancho/enumerate-iam).\n This gives broader view of the discovered AWS credentials privileges instead of just checking S3 buckets.\n $ git clone https://github.com/andresriancho/enumerate-iam\n  cd  enumerate-iam\n  ./enumerate-iam.py --access-key ACCESS_KEY_HERE --secret-key [SECRET_KEY]\n",
+      "exploit": "Install awscli (https://aws.amazon.com/cli/), set the access key and secret to environment variables, and execute the following command: $ AWS_ACCESS_KEY_ID=ACCESS_KEY_HERE AWS_SECRET_ACCESS_KEY=[SECRET_KEY] aws sts get-caller-identity\n AWS credentials' permissions can be determined using enumerate-IAM (https://github.com/andresriancho/enumerate-iam).\n This gives broader view of the discovered AWS credentials privileges instead of just checking S3 buckets.\n $ git clone https://github.com/andresriancho/enumerate-iam\n  cd  enumerate-iam\n  ./enumerate-iam.py --access-key ACCESS_KEY_HERE --secret-key [SECRET_KEY]\n",
       "rarity": 0.2,
       "url": null,
       "tags": [
@@ -2499,7 +2499,7 @@
       "regex": "^((?<![A-Za-z0-9\\/+=])[A-Za-z0-9\\/+=]{40}(?![A-Za-z0-9\\/+=]))$",
       "plural_name": false,
       "description": null,
-      "Exploit": "Install awscli (https://aws.amazon.com/cli/), set the access key and secret to environment variables, and execute the following command: $ AWS_ACCESS_KEY_ID=[ACCESS_KEY] AWS_SECRET_ACCESS_KEY=SECRET_KEY_HERE aws sts get-caller-identity\n AWS credentials' permissions can be determined using enumerate-IAM (https://github.com/andresriancho/enumerate-iam).\n This gives broader view of the discovered AWS credentials privileges instead of just checking S3 buckets.\n $ git clone https://github.com/andresriancho/enumerate-iam\n  cd  enumerate-iam\n  ./enumerate-iam.py --access-key [ACCESS_KEY] --secret-key SECRET_KEY_HERE\n",
+      "exploit": "Install awscli (https://aws.amazon.com/cli/), set the access key and secret to environment variables, and execute the following command: $ AWS_ACCESS_KEY_ID=[ACCESS_KEY] AWS_SECRET_ACCESS_KEY=SECRET_KEY_HERE aws sts get-caller-identity\n AWS credentials' permissions can be determined using enumerate-IAM (https://github.com/andresriancho/enumerate-iam).\n This gives broader view of the discovered AWS credentials privileges instead of just checking S3 buckets.\n $ git clone https://github.com/andresriancho/enumerate-iam\n  cd  enumerate-iam\n  ./enumerate-iam.py --access-key [ACCESS_KEY] --secret-key SECRET_KEY_HERE\n",
       "rarity": 0.2,
       "url": null,
       "tags": [
@@ -2561,7 +2561,7 @@
       "regex": "^(EA[0-9A-Za-z]{190,})$",
       "plural_name": false,
       "description": null,
-      "Exploit": null,
+      "exploit": null,
       "rarity": 0.2,
       "url": "https://developers.facebook.com/tools/debug/accesstoken/?access_token=",
       "tags": [
@@ -2704,7 +2704,7 @@
       "regex": "^([a-f0-9]{32})$",
       "plural_name": false,
       "description": null,
-      "Exploit": "Use the command below to verify that the API key is valid:\n  $ curl -X GET https://api.datadoghq.com/api/v1/validate -H \"Content-Type: application/json\" -H \"DD-API-KEY: API_KEY_HERE\"\n",
+      "exploit": "Use the command below to verify that the API key is valid:\n  $ curl -X GET https://api.datadoghq.com/api/v1/validate -H \"Content-Type: application/json\" -H \"DD-API-KEY: API_KEY_HERE\"\n",
       "rarity": 0,
       "url": null,
       "tags": [
@@ -2730,7 +2730,7 @@
       "regex": "^([a-f0-9]{40})$",
       "plural_name": false,
       "description": null,
-      "Exploit": null,
+      "exploit": null,
       "rarity": 0,
       "url": null,
       "tags": [

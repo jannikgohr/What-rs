@@ -2,15 +2,17 @@ mod regex_pd;
 mod filter;
 mod identifier;
 mod options;
+mod format;
 
 use crate::filter::{create_filter, parse_rarity, Filter};
-use crate::identifier::identify;
-use crate::options::Options;
+use crate::identifier::{identify, Match};
+use crate::options::{Options, OutputFormat};
 use crate::regex_pd::load_regex_pattern_data;
 use anyhow::{Context, Result};
 use clap::{Arg, Command};
 use human_panic::setup_panic;
 use std::process;
+use crate::format::{get_format, output};
 
 const HELP_TEMPLATE_FORMAT: &str = "\
 {before-help}{name} {version}
@@ -23,7 +25,7 @@ const HELP_TEMPLATE_FORMAT: &str = "\
 
 fn main() {
     setup_panic!();
-    let matches = Command::new(env!("CARGO_PKG_NAME"))
+    let cli = Command::new(env!("CARGO_PKG_NAME"))
         .version(env!("CARGO_PKG_VERSION"))
         .author(env!("CARGO_PKG_AUTHORS"))
         .about(env!("CARGO_PKG_DESCRIPTION"))
@@ -73,16 +75,21 @@ fn main() {
                 .help("Disable borderless mode.")
                 .action(clap::ArgAction::SetTrue),
         )
+        .arg(
+            Arg::new("format")
+                .long("format")
+                .help("Output format. Choose between DEFAULT, JSON, PRETTY")
+        )
         .get_matches();
 
-    if matches.get_flag("tags") {
+    if cli.get_flag("tags") {
         print_tags().unwrap();
         process::exit(0);
     }
 
     let regex_data = load_regex_pattern_data("data/regex.json").unwrap();
 
-    let rarity = matches
+    let rarity = cli
         .get_one::<String>("rarity")
         .map(|s| parse_rarity(s))
         .transpose()
@@ -90,24 +97,30 @@ fn main() {
 
     let filter: Filter = create_filter(
         rarity,
-        !matches.get_flag("disable-borderless"),
-        matches.get_one::<String>("include"),
-        matches.get_one::<String>("exclude"),
+        !cli.get_flag("disable-borderless"),
+        cli.get_one::<String>("include"),
+        cli.get_one::<String>("exclude"),
     );
 
-    let options: Options = Options {
-        only_text: matches.get_flag("only_text"),
+    let mut options: Options = Options {
+        only_text: cli.get_flag("only_text"),
+        format: OutputFormat::DEFAULT,
     };
 
-    let input = matches.get_one::<String>("input").cloned();
+    options.format = get_format(&cli.get_one::<String>("format"));
+
+    let input = cli.get_one::<String>("input").cloned();
     if input.is_none() {
         eprintln!("Text input expected. Run '--help' for usage.");
         process::exit(1);
     }
 
     // Determine if the input is text or a file/directory path
-    if let Some(input) = matches.get_one::<String>("input") {
-        identify(input, regex_data, filter, options).unwrap();
+    if let Some(input) = cli.get_one::<String>("input") {
+        let mut matches: Vec<Match> = Vec::new();
+        identify(input, regex_data, &mut matches, &filter, &options).unwrap();
+        dbg!(&matches);
+        output(&matches, &options)
     } else {
         eprintln!("Input as text or file/directory path expected. Run '--help' for usage.");
         process::exit(1);

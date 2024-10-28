@@ -11,6 +11,7 @@ pub struct PatternData {
     pub regex_no_anchor : Option<String>,
     pub plural_name: bool,
     pub description: Option<String>,
+    pub exploit: Option<String>,
     pub rarity: f64,
     pub url: Option<String>,
     pub tags: Option<Vec<String>>,
