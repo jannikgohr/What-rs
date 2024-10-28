@@ -9,8 +9,7 @@ use crate::options::Options;
 use crate::regex_pd::load_regex_pattern_data;
 use anyhow::{Context, Result};
 use clap::{Arg, Command};
-use serde::Deserialize;
-use std::io::Read;
+use human_panic::setup_panic;
 use std::process;
 
 const HELP_TEMPLATE_FORMAT: &str = "\
@@ -22,7 +21,8 @@ const HELP_TEMPLATE_FORMAT: &str = "\
 {all-args}{after-help}
 ";
 
-fn main() -> Result<()> {
+fn main() {
+    setup_panic!();
     let matches = Command::new(env!("CARGO_PKG_NAME"))
         .version(env!("CARGO_PKG_VERSION"))
         .author(env!("CARGO_PKG_AUTHORS"))
@@ -76,17 +76,17 @@ fn main() -> Result<()> {
         .get_matches();
 
     if matches.get_flag("tags") {
-        print_tags()?;
+        print_tags().unwrap();
         process::exit(0);
     }
 
-    let regex_data = load_regex_pattern_data("data/regex.json")?;
+    let regex_data = load_regex_pattern_data("data/regex.json").unwrap();
 
     let rarity = matches
         .get_one::<String>("rarity")
         .map(|s| parse_rarity(s))
         .transpose()
-        .context("Invalid rarity range format. Expected 'min:max'")?;
+        .context("Invalid rarity range format. Expected 'min:max'").unwrap();
 
     let filter: Filter = create_filter(
         rarity,
@@ -107,13 +107,11 @@ fn main() -> Result<()> {
 
     // Determine if the input is text or a file/directory path
     if let Some(input) = matches.get_one::<String>("input") {
-        identify(input, regex_data, filter, options)?;
+        identify(input, regex_data, filter, options).unwrap();
     } else {
         eprintln!("Input as text or file/directory path expected. Run '--help' for usage.");
         process::exit(1);
     }
-
-    Ok(())
 }
 
 fn print_tags() -> Result<()> {
