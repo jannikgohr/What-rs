@@ -1,7 +1,6 @@
-extern crate regex;
+use fancy_regex::Regex;
 use anyhow::{Context, Result};
 use clap::{Arg, Command};
-use regex::Regex;
 use serde::Deserialize;
 use std::fs::File;
 use std::io::Read;
@@ -9,9 +8,10 @@ use std::path::Path;
 use std::{fs, io, process};
 
 #[derive(Debug, Deserialize)]
-struct DataEntry {
+struct PatternData {
     name: String,
     regex: String,
+    regex_no_anchor : Option<String>,
     plural_name: bool,
     description: Option<String>,
     rarity: f64,
@@ -38,13 +38,24 @@ struct ExamplesData {
 struct Filter {
     min: f64,
     max: f64,
+    borderless: bool
 }
 
+const HELP_TEMPLATE_FORMAT: &str = "\
+{before-help}{name} {version}
+{about-with-newline}
+{author-with-newline}
+{usage-heading} {usage}
+
+{all-args}{after-help}
+";
+
 fn main() -> Result<()> {
-    let matches = Command::new("pyWhat in Rust")
+    let matches = Command::new(env!("CARGO_PKG_NAME"))
         .version(env!("CARGO_PKG_VERSION"))
-        .author("Jannik Gohr <https://github.com/jannikgohr/What-rs>")
-        .about("Identify what something is.")
+        .author(env!("CARGO_PKG_AUTHORS"))
+        .about(env!("CARGO_PKG_DESCRIPTION"))
+        .help_template(HELP_TEMPLATE_FORMAT)
         .arg(
             Arg::new("text_input")
                 .help("Text input to identify")
@@ -83,6 +94,13 @@ fn main() -> Result<()> {
                 .help("Do not scan files or folders.")
                 .action(clap::ArgAction::SetTrue),
         )
+        .arg(
+            Arg::new("disable-borderless")
+                .short('d')
+                .long("disable-borderless")
+                .help("Disable borderless mode.")
+                .action(clap::ArgAction::SetTrue),
+        )
         .get_matches();
 
     if matches.get_flag("tags") {
@@ -91,7 +109,6 @@ fn main() -> Result<()> {
     }
 
     let regex_data = load_regex_pattern_data("data/regex.json")?;
-    // println!("{:#?}", regex.get(0));
 
     let rarity = matches
         .get_one::<String>("rarity")
@@ -101,6 +118,7 @@ fn main() -> Result<()> {
 
     let filter: Filter = create_filter(
         rarity,
+        !matches.get_flag("disable-borderless"),
         matches.get_one::<String>("include"),
         matches.get_one::<String>("exclude"),
     );
@@ -158,11 +176,12 @@ fn parse_rarity(rarity: &str) -> Result<(f64, f64)> {
 
 fn create_filter(
     rarity: Option<(f64, f64)>,
+    borderless: bool,
     include: Option<&String>,
     exclude: Option<&String>,
 ) -> Filter {
     // TODO: Add include and exclude filter
-    let mut filter: Filter = Filter { min: 0f64, max: 1f64 };
+    let mut filter: Filter = Filter { min: 0f64, max: 1f64, borderless };
     
     if let Some((min, max)) = rarity {
         println!("Setting rarity filter: min={}, max={}", min, max);
@@ -181,7 +200,7 @@ fn create_filter(
     filter
 }
 
-fn identify_file(path: &Path, regex: &Vec<DataEntry>, filter: &Filter) -> Result<()> {
+fn identify_file(path: &Path, regex: &Vec<PatternData>, filter: &Filter) -> Result<()> {
     // TODO: Better error handling
     println!("Identifying file {:?}", path);
     let content = fs::read_to_string(path)
@@ -190,7 +209,7 @@ fn identify_file(path: &Path, regex: &Vec<DataEntry>, filter: &Filter) -> Result
     Ok(())
 }
 
-fn identify_directory(path: &Path, regex: &Vec<DataEntry>, filter: &Filter) -> Result<()> {
+fn identify_directory(path: &Path, regex: &Vec<PatternData>, filter: &Filter) -> Result<()> {
     println!("Identifying directory: {:?}", path);
     for entry in fs::read_dir(path)? {
         let entry = entry?;
@@ -204,41 +223,46 @@ fn identify_directory(path: &Path, regex: &Vec<DataEntry>, filter: &Filter) -> R
     Ok(())
 }
 
-fn identify_text(text: String, regex_data: &Vec<DataEntry>, filter: &Filter) {
-    let mut broken_regex_patterns = 0;
+fn identify_text(text: String, regex_data: &Vec<PatternData>, filter: &Filter) {
     for r in regex_data {
         if r.rarity < filter.min { 
-            
+            continue
         }
-        
-        let regex_pattern = &r.regex;
-        // Find all matches
-        // println!("Use regex pattern {}", regex_pattern);
-        let re = match Regex::new(&regex_pattern) {
-            Ok(r) => r,
-            Err(_error) => {
-                // TODO: Fix broken regex patterns and use other regex crate like fancy-regex
-                broken_regex_patterns += 1;
-                // println!("Regex pattern for {} not valid.", r.name);
-                // println!("Error: {}", _error);
-                continue
-            },
+        let regex_pattern = match &r.regex_no_anchor {
+            Some(pattern) if filter.borderless => pattern,
+            _ => &r.regex
         };
+        // Find all matches
+        let re = Regex::new(&regex_pattern).unwrap();
         for mat in re.find_iter(&*text) {
-            println!("Found match: {}", mat.as_str());
+            println!();
+            println!("Found match: {}", mat.unwrap().as_str());
             println!("Type: {}", r.name.as_str());
+            println!("Using: {}", regex_pattern);
         }
     }
-    println!("Counted {}/{} broken regex patterns.", broken_regex_patterns, regex_data.len());
-    // println!("Identifying text: {}", _text);
 }
 
-fn load_regex_pattern_data(file_path: &str) -> Result<Vec<DataEntry>, io::Error> {
+fn load_regex_pattern_data(file_path: &str) -> Result<Vec<PatternData>, io::Error> {
     let mut file = File::open(file_path)?;
     let mut contents = String::new();
     file.read_to_string(&mut contents)?;
 
     // Parse the JSON string into a Vec<DataEntry>
-    let json_data: Vec<DataEntry> = serde_json::from_str(&contents)?;
+    let mut json_data: Vec<PatternData> = serde_json::from_str(&contents)?;
+
+
+    for pattern in &mut json_data {
+        // Regex to remove `^` not within `[]` or escaped
+        let re_start = Regex::new(r"(?<!\\)\^(?![^\[\]]*(?<!\\)\])").unwrap();
+        // Regex to remove `$` not within `[]` or escaped
+        let re_end = Regex::new(r"(?<!\\)\$(?![^\[\]]*(?<!\\)\])").unwrap();
+
+        // Apply the regex replacements
+        let regex_no_start_anchor = re_start.replace_all(&pattern.regex, "");
+        let regex_no_anchor = re_end.replace_all(&regex_no_start_anchor, "");
+        pattern.regex_no_anchor = Option::from(regex_no_anchor.to_string());
+    }
+
     Ok(json_data)
 }
