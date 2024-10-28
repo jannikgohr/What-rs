@@ -1,9 +1,24 @@
+use std::cmp::min;
 use crate::identifier::Match;
 use crate::options::{Options, OutputFormat};
 use colored::*;
 use fancy_regex::Regex;
 use std::process;
+use tabled::settings::object::Columns;
+use tabled::settings::peaker::PriorityMax;
+use tabled::settings::Width;
 use tabled::{settings::{object::Rows, style::Style, themes::Colorization, Color}, Table, Tabled};
+
+use terminal_size::{terminal_size, Height as TerminalHeight, Width as TerminalWidth};
+
+const MAX_TABLE_WIDTH: usize = 300;
+
+fn get_terminal_size() -> (usize, usize) {
+    let (TerminalWidth(width), TerminalHeight(height)) =
+        terminal_size().expect("failed to obtain a terminal size");
+
+    (width as usize, height as usize)
+}
 
 #[derive(Tabled)]
 struct MatchTableRow {
@@ -71,7 +86,7 @@ fn c_print_default(matches: &Vec<Match>) {
         output.push(String::from("\n"));
     }
     let output_text = output.join("");
-    display_wikitext(output_text.as_str());
+    println!("{}", parse_wikitext(output_text.as_str()));
 }
 
 fn c_print_json(matches: &Vec<Match>) {
@@ -82,18 +97,24 @@ fn c_print_json(matches: &Vec<Match>) {
 fn c_print_pretty(matches: &Vec<Match>) {
     let rows = matches_to_table_rows(matches);
     let mut table = Table::new(rows);
+    let (width, _height) = get_terminal_size();
+    println!("{}", width);
     table
         .with(Style::modern())
-        .with(Colorization::exact([Color::FG_MAGENTA], Rows::first()));
-    display_wikitext(table.to_string().as_str());
-    //println!("{}", table);
+        .with(Colorization::exact([Color::FG_MAGENTA], Rows::first()))
+        .modify(Columns::new(3..), Width::wrap(width - 65).keep_words(true))
+        .modify(Columns::new(0..2), Width::wrap(25).keep_words(true))
+        .with(Width::wrap(width).priority(PriorityMax))
+        .with(Width::increase(min(width, MAX_TABLE_WIDTH)))
+    ;
+    println!("{}", table.to_string().as_str());
 }
 
 fn c_print_raw(_matches: &Vec<Match>) {
     panic!("c_print_raw: not implemented yet");
 }
 
-fn display_wikitext(wikitext: &str) {
+fn parse_wikitext(wikitext: &str) -> String {
     let color_re = Regex::new(r"\[#([A-Fa-f0-9]{6})\](.*?)\[/#\1\]").unwrap();
     let link_re = Regex::new(r"\[link=(.*?)\](.*?)\[/link\]").unwrap();
 
@@ -129,12 +150,12 @@ fn display_wikitext(wikitext: &str) {
                 result = result.replace(&captures[0], &formatted_link.to_string());
             }
             Err(e) => {
-                eprintln!("Regex error: {}", e); // Log the error if needed
+                eprintln!("Regex error: {}", e);
             }
         }
     }
 
-    println!("{}", result);
+    result
 }
 
 fn matches_to_table_rows(matches: &Vec<Match>) -> Vec<MatchTableRow> {
@@ -146,12 +167,13 @@ fn matches_to_table_rows(matches: &Vec<Match>) -> Vec<MatchTableRow> {
         let name = m.name.clone();
         let description;
         if let Some(m_desc) = &m.description {
-            description = m_desc.to_string()
+            description = parse_wikitext(&*m_desc.to_string())
         } else if let Some(link) = &m.link {
             let mut desc = String::from("Click here to analyse in the browser\n");
             desc += link.clone().as_str();
-            desc += &*m.matched_on.as_str().replace(" ", "");
-            description = desc
+            desc += &*m.matched_on.as_str();
+            description = parse_wikitext(&*desc);
+            println!("{} ({})", &description, description.len())
         } else {
             description = String::from("None");
         }
