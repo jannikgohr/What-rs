@@ -62,25 +62,25 @@ fn c_print_default(matches: &Vec<Match>) {
     let mut output: Vec<String> = Vec::new();
     for m in matches {
         output.push(String::from("\n"));
-        output.push(String::from("Matched on: "));
+        output.push(String::from("Matched on: ").blue().to_string());
         output.push(m.matched_on.clone());
         output.push(String::from("\n"));
-        output.push(String::from("Name: "));
+        output.push(String::from("Name: ").blue().to_string());
         output.push(m.name.clone());
         if let Some(description) = &m.description {
             output.push(String::from("\n"));
-            output.push(String::from("Description: "));
+            output.push(String::from("Description: ").blue().to_string());
             output.push(description.clone());
         }
         if let Some(link) = &m.link {
             output.push(String::from("\n"));
-            output.push(String::from("Link: "));
+            output.push(String::from("Link: ").blue().to_string());
             output.push(link.clone());
             output.push(m.matched_on.as_str().replace(" ", ""));
         }
         if let Some(exploit) = &m.exploit {
             output.push(String::from("\n"));
-            output.push(String::from("Exploit: "));
+            output.push(String::from("Exploit: ").blue().to_string());
             output.push(exploit.clone());
         }
         output.push(String::from("\n"));
