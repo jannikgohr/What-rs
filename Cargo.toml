@@ -1,6 +1,6 @@
 [package]
 name = "What-rs"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 authors = ["Jannik Gohr <JannikG-Dev@pm.me>"]
 description = """What-rs - Identify what something is\n
