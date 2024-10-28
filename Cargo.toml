@@ -6,11 +6,9 @@ authors = ["Jannik Gohr <JannikG-Dev@pm.me>"]
 description = """What-rs - Identify what something is\n
 A pyWhat reimplemantation in Rust made by <https://github.com/jannikgohr>"""
 
-# Make tests work with the name used in the tutorial
 [[bin]]
 name = "What-rs"
 path = "src/main.rs"
-
 
 [dependencies]
 clap = { version = "4.5.20", features = ["derive"] }
