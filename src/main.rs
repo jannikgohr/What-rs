@@ -1,16 +1,17 @@
 mod regex_pd;
 mod filter;
 mod identifier;
+mod options;
 
-use crate::identifier::{identify_directory, identify_file, identify_text};
+use crate::filter::{create_filter, parse_rarity, Filter};
+use crate::identifier::identify;
+use crate::options::Options;
 use crate::regex_pd::load_regex_pattern_data;
 use anyhow::{Context, Result};
 use clap::{Arg, Command};
 use serde::Deserialize;
 use std::io::Read;
-use std::path::Path;
 use std::process;
-use crate::filter::{create_filter, Filter};
 
 const HELP_TEMPLATE_FORMAT: &str = "\
 {before-help}{name} {version}
@@ -94,6 +95,10 @@ fn main() -> Result<()> {
         matches.get_one::<String>("exclude"),
     );
 
+    let options: Options = Options {
+        only_text: matches.get_flag("only_text"),
+    };
+
     let input = matches.get_one::<String>("input").cloned();
     if input.is_none() {
         eprintln!("Text input expected. Run '--help' for usage.");
@@ -102,21 +107,7 @@ fn main() -> Result<()> {
 
     // Determine if the input is text or a file/directory path
     if let Some(input) = matches.get_one::<String>("input") {
-        let path = Path::new(input);
-        if !matches.get_flag("only_text") && path.exists(){
-            // Handle as a file or directory path
-            if path.is_file() {
-                identify_file(path, &regex_data, &filter)?;
-            } else if path.is_dir() {
-                identify_directory(path, &regex_data, &filter)?;
-            } else {
-                eprintln!("Input path is not a file or directory");
-                process::exit(1);
-            }
-        } else {
-            // Handle as plain text
-            identify_text(input.to_string(), &regex_data, &filter);
-        }
+        identify(input, regex_data, filter, options)?;
     } else {
         eprintln!("Input as text or file/directory path expected. Run '--help' for usage.");
         process::exit(1);
@@ -131,19 +122,6 @@ fn print_tags() -> Result<()> {
     Ok(())
 }
 
-fn parse_rarity(rarity: &str) -> Result<(f64, f64)> {
-    let parts: Vec<&str> = rarity.split(':').collect();
-    if parts.len() != 2 {
-        anyhow::bail!("Invalid rarity format. \
-        Format must be 'min:max', where min and max are decimal numbers seperated by a colon.");
-    }
-    let min = parts[0].parse::<f64>()?;
-    let max = parts[1].parse::<f64>()?;
-    if min < 0f64 || max > 1f64 {
-        anyhow::bail!("Invalid rarity range. Range must be between 0 and 1 inclusive.");
-    }
-    Ok((min, max))
-}
 
 
 

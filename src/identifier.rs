@@ -1,8 +1,9 @@
-use std::fs;
+use std::{fs, process};
 use std::path::Path;
 use anyhow::Context;
 use fancy_regex::Regex;
 use crate::Filter;
+use crate::options::Options;
 use crate::regex_pd::PatternData;
 
 pub fn identify_directory(path: &Path, regex: &Vec<PatternData>, filter: &Filter) -> anyhow::Result<()> {
@@ -48,3 +49,23 @@ pub fn identify_text(text: String, regex_data: &Vec<PatternData>, filter: &Filte
     }
 }
 
+pub fn identify(input: &String, regex_data: Vec<PatternData>, filter: Filter, options: Options) -> anyhow::Result<()> {
+    // Determine if the input is text or a file/directory path
+    let path = Path::new(input);
+    if !options.only_text && path.exists(){
+        // Handle as a file or directory path
+        if path.is_file() {
+            identify_file(path, &regex_data, &filter)?;
+        } else if path.is_dir() {
+            identify_directory(path, &regex_data, &filter)?;
+        } else {
+            eprintln!("Input path is not a file or directory");
+            process::exit(1);
+        }
+    } else {
+        // Handle as plain text
+        identify_text(input.to_string(), &regex_data, &filter);
+    }
+
+    Ok(())
+}
