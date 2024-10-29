@@ -4,15 +4,10 @@
 
 _The easiest way to identify anything_ 🔎
 
+A reimplementation of the popular [pyWhat](https://github.com/bee-san/pyWhat/)
 
 [![build and release](https://github.com/jannikgohr/What-rs/actions/workflows/multi-platform-release.yml/badge.svg)](https://github.com/jannikgohr/What-rs/releases)
 [![build and release](https://github.com/jannikgohr/What-rs/actions/workflows/test.yml/badge.svg)](https://github.com/jannikgohr/What-rs/actions/workflows/test.yml)
-
----
-
-A reimplementation of the popular [pyWhat](https://github.com/bee-san/pyWhat/)
-
----
 
 </div>
 
