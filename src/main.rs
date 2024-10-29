@@ -5,14 +5,15 @@ mod options;
 mod format;
 
 use crate::filter::{create_filter, parse_rarity, Filter};
+use crate::format::{get_format, output};
 use crate::identifier::{identify, Match};
 use crate::options::{Options, OutputFormat};
 use crate::regex_pd::load_regex_pattern_data;
 use anyhow::{Context, Result};
 use clap::{Arg, Command};
+use clap_complete::aot::{generate, Generator, Shell};
 use human_panic::setup_panic;
-use std::process;
-use crate::format::{get_format, output};
+use std::{io, process};
 
 const HELP_TEMPLATE_FORMAT: &str = "\
 {before-help}{name} {version}
@@ -25,9 +26,8 @@ const HELP_TEMPLATE_FORMAT: &str = "\
 
 const JSON_DATA: &str = include_str!("../data/regex.json");
 
-fn main() {
-    setup_panic!();
-    let cli = Command::new(env!("CARGO_PKG_NAME"))
+fn cli() -> Command {
+    Command::new(env!("CARGO_PKG_NAME"))
         .version(env!("CARGO_PKG_VERSION"))
         .author(env!("CARGO_PKG_AUTHORS"))
         .about(env!("CARGO_PKG_DESCRIPTION"))
@@ -80,18 +80,48 @@ fn main() {
         .arg(
             Arg::new("format")
                 .long("format")
-                .help("Output format. Choose between DEFAULT, JSON, PRETTY")
+                .help("Output format.")
+                .value_parser(["default", "json", "pretty"]),
         )
-        .get_matches();
+        .arg(
+            Arg::new("reverse")
+                .long("reverse")
+                .help("Reverse the sorting order.")
+                .action(clap::ArgAction::SetTrue),
+        )
+        .arg(
+            Arg::new("key")
+                .long("key")
+                .value_parser(["name", "rarity", "matched", "none"])
+                .default_value("none")
+                .default_missing_value("none")
+                .help("Filter by key name."),
+        )
+}
 
-    if cli.get_flag("tags") {
+fn main() {
+    setup_panic!();
+
+    clap_complete::CompleteEnv::with_factory(cli)
+        .completer("exhaustive")
+        .complete();
+
+    let matches = cli().get_matches();
+    if let Some(generator) = matches.get_one::<Shell>("generate") {
+        let mut cmd = cli();
+        eprintln!("Generating completion file for {generator}...");
+        print_completions(*generator, &mut cmd);
+        return;
+    }
+
+    if matches.get_flag("tags") {
         print_tags().unwrap();
         process::exit(0);
     }
 
     let regex_data = load_regex_pattern_data(JSON_DATA).unwrap();
 
-    let rarity = cli
+    let rarity = matches
         .get_one::<String>("rarity")
         .map(|s| parse_rarity(s))
         .transpose()
@@ -99,19 +129,19 @@ fn main() {
 
     let filter: Filter = create_filter(
         rarity,
-        !cli.get_flag("disable-borderless"),
-        cli.get_one::<String>("include"),
-        cli.get_one::<String>("exclude"),
+        !matches.get_flag("disable-borderless"),
+        matches.get_one::<String>("include"),
+        matches.get_one::<String>("exclude"),
     );
 
     let mut options: Options = Options {
-        only_text: cli.get_flag("only_text"),
+        only_text: matches.get_flag("only_text"),
         format: OutputFormat::DEFAULT,
     };
 
-    options.format = get_format(&cli.get_one::<String>("format"));
+    options.format = get_format(&matches.get_one::<String>("format"));
 
-    let input = cli.get_one::<String>("input").cloned();
+    let input = matches.get_one::<String>("input").cloned();
     if input.is_none() {
         println!("{} (Version: {})", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"));
         println!("\n{}", env!("CARGO_PKG_DESCRIPTION"));
@@ -122,7 +152,7 @@ fn main() {
     }
 
     // Determine if the input is text or a file/directory path
-    if let Some(input) = cli.get_one::<String>("input") {
+    if let Some(input) = matches.get_one::<String>("input") {
         let mut matches: Vec<Match> = Vec::new();
         identify(input, regex_data, &mut matches, &filter, &options).unwrap();
         output(&matches, &options)
@@ -130,6 +160,10 @@ fn main() {
         eprintln!("Input as text or file/directory path expected. Run '--help' for usage.");
         process::exit(1);
     }
+}
+
+fn print_completions<G: Generator>(gen: G, cmd: &mut Command) {
+    generate(gen, cmd, cmd.get_name().to_string(), &mut io::stdout());
 }
 
 fn print_tags() -> Result<()> {

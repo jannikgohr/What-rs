@@ -1,3 +1,4 @@
+<!--suppress HtmlDeprecatedAttribute -->
 <div align="center" style="text-align: center;">
 
 # What-rs
@@ -24,7 +25,7 @@ Well, with `what-rs` all you have to do is ask `what-rs "0x52908400098527886E0F7
 
 ---
 
-⚠️ The project is under very active development and not yet feature complete with [pyWhat](https://github.com/bee-san/pyWhat/) ⚠️
+⚠️ The project is under active development and not yet feature complete with [pyWhat](https://github.com/bee-san/pyWhat/) ⚠️
 
 ---
 

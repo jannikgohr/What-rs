@@ -4,7 +4,7 @@ version = "0.1.2"
 edition = "2021"
 authors = ["Jannik Gohr <JannikG-Dev@pm.me>"]
 description = """What-rs - Identify what something is!\n
-A pyWhat reimplemantation in Rust."""
+A pyWhat reimplementation in Rust."""
 homepage = "https://github.com/jannikgohr/What-rs"
 
 [profile.release]
@@ -17,6 +17,7 @@ path = "src/main.rs"
 
 [dependencies]
 clap = { version = "4.5.20", features = ["derive"] }
+clap_complete = { version = "4.5.36", features = ["unstable-dynamic"]}
 human-panic = "2.0.2"
 anyhow = "1.0.91"
 serde = { version = "1.0.213", features = ["derive"] }
