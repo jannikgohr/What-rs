@@ -1,4 +1,4 @@
-name: build and release
+name: Test current state
 
 on:
   pull_request:
@@ -10,7 +10,7 @@ on:
 
 jobs:
   test:
-    name: Test current state
+    name: Test on ubuntu-latest
     runs-on: ubuntu-latest
 
     steps:
