@@ -1,0 +1,19 @@
+name: tests
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+  release:
+    types: [ created ]
+
+jobs:
+  test:
+    name: Test on ubuntu-latest
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Run tests
+      run: cargo test --verbose
