@@ -97,6 +97,12 @@ fn cli() -> Command {
                 .default_missing_value("none")
                 .help("Filter by key name."),
         )
+        .arg(
+            Arg::new("generate")
+                .long("generate")
+                .help("Generate a shell completion file for the specified shell")
+                .value_parser(["bash", "zsh", "fish", "powershell", "elvish"]),
+        )
 }
 
 fn main() {
