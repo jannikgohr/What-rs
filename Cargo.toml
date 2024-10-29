@@ -7,6 +7,10 @@ description = """What-rs - Identify what something is\n
 A pyWhat reimplemantation in Rust made by <https://github.com/jannikgohr>"""
 homepage = "https://github.com/jannikgohr/What-rs"
 
+[profile.release]
+codegen-units = 1
+lto = true
+
 [[bin]]
 name = "What-rs"
 path = "src/main.rs"
