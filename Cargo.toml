@@ -3,8 +3,8 @@ name = "What-rs"
 version = "0.1.2"
 edition = "2021"
 authors = ["Jannik Gohr <JannikG-Dev@pm.me>"]
-description = """What-rs - Identify what something is\n
-A pyWhat reimplemantation in Rust made by <https://github.com/jannikgohr>"""
+description = """What-rs - Identify what something is!\n
+A pyWhat reimplemantation in Rust."""
 homepage = "https://github.com/jannikgohr/What-rs"
 
 [profile.release]

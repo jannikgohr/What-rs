@@ -113,7 +113,11 @@ fn main() {
 
     let input = cli.get_one::<String>("input").cloned();
     if input.is_none() {
-        eprintln!("Text input expected. Run '--help' for usage.");
+        println!("{} (Version: {})", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"));
+        println!("\n{}", env!("CARGO_PKG_DESCRIPTION"));
+        println!("Made by {}", env!("CARGO_PKG_AUTHORS"));
+        println!("For more information see {}", env!("CARGO_PKG_HOMEPAGE"));
+        eprintln!("\nRun '--help' for usage.");
         process::exit(1);
     }
 
