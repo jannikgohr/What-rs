@@ -1,14 +1,12 @@
 mod regex_pd;
 mod filter;
 mod identifier;
-mod options;
 mod format;
 mod sorter;
 
 use crate::filter::Filter;
-use crate::format::{get_format, output};
+use crate::format::{get_format, output, Options, OutputFormat};
 use crate::identifier::{identify, Match};
-use crate::options::{Options, OutputFormat};
 use crate::regex_pd::load_regex_pattern_data;
 use crate::sorter::Sorter;
 use anyhow::Result;
@@ -148,7 +146,6 @@ fn main() {
 
 
     let mut options: Options = Options {
-        only_text: cli_matches.get_flag("only_text"),
         format: OutputFormat::DEFAULT,
     };
 
@@ -167,7 +164,7 @@ fn main() {
     // Determine if the input is text or a file/directory path
     if let Some(input) = cli_matches.get_one::<String>("input") {
         let mut matches: Vec<Match> = Vec::new();
-        identify(input, regex_data, &mut matches, &filter, &options).unwrap();
+        identify(input, regex_data, &mut matches, &filter, cli_matches.get_flag("only_text")).unwrap();
         Sorter::default()
             .key(cli_matches.get_one::<String>("key").unwrap())
             .reverse(cli_matches.get_flag("reverse"))
