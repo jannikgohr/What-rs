@@ -1,17 +1,17 @@
 pub struct Filter {
-    pub(crate) min: f64,
-    pub(crate) max: f64,
+    pub(crate) min: f32,
+    pub(crate) max: f32,
     pub(crate) borderless: bool
 }
 
 pub fn create_filter(
-    rarity: Option<(f64, f64)>,
+    rarity: Option<(f32, f32)>,
     borderless: bool,
     include: Option<&String>,
     exclude: Option<&String>,
 ) -> Filter {
     // TODO: Add include and exclude filter
-    let mut filter: Filter = Filter { min: 0f64, max: 1f64, borderless };
+    let mut filter: Filter = Filter { min: 0f32, max: 1f32, borderless };
 
     if let Some((min, max)) = rarity {
         filter.min = min;
@@ -29,15 +29,15 @@ pub fn create_filter(
     filter
 }
 
-pub fn parse_rarity(rarity: &str) -> anyhow::Result<(f64, f64)> {
+pub fn parse_rarity(rarity: &str) -> anyhow::Result<(f32, f32)> {
     let parts: Vec<&str> = rarity.split(':').collect();
     if parts.len() != 2 {
         anyhow::bail!("Invalid rarity format. \
         Format must be 'min:max', where min and max are decimal numbers seperated by a colon.");
     }
-    let min = parts[0].parse::<f64>()?;
-    let max = parts[1].parse::<f64>()?;
-    if min < 0f64 || max > 1f64 {
+    let min = parts[0].parse::<f32>()?;
+    let max = parts[1].parse::<f32>()?;
+    if min < 0f32 || max > 1f32 {
         anyhow::bail!("Invalid rarity range. Range must be between 0 and 1 inclusive.");
     }
     Ok((min, max))

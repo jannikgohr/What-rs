@@ -10,7 +10,7 @@ pub struct PatternData {
     pub plural_name: bool,
     pub description: Option<String>,
     pub exploit: Option<String>,
-    pub rarity: f64,
+    pub rarity: f32,
     pub url: Option<String>,
     pub tags: Option<Vec<String>>,
     pub children: Option<ChildrenData>,

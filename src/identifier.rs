@@ -11,6 +11,7 @@ use serde::Serialize;
 pub struct Match {
     pub matched_on: String,
     pub name: String,
+    pub rarity: f32,
     pub description: Option<String>,
     pub link: Option<String>,
     pub exploit: Option<String>,
