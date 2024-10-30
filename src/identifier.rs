@@ -55,6 +55,7 @@ pub fn identify_text(text: String, regex_data: &Vec<PatternData>, matches: &mut 
                 Match {
                     matched_on: mat.unwrap().as_str().to_string(),
                     name: r.name.as_str().to_string(),
+                    rarity: r.rarity,
                     description: match &r.description {
                         Some(description) => Some(description.to_string()),
                         None => None

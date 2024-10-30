@@ -3,12 +3,14 @@ mod filter;
 mod identifier;
 mod options;
 mod format;
+mod sorter;
 
 use crate::filter::{create_filter, parse_rarity, Filter};
 use crate::format::{get_format, output};
 use crate::identifier::{identify, Match};
 use crate::options::{Options, OutputFormat};
 use crate::regex_pd::load_regex_pattern_data;
+use crate::sorter::Sorter;
 use anyhow::{Context, Result};
 use clap::{Arg, Command};
 use clap_complete::aot::{generate, Generator};
@@ -113,8 +115,8 @@ fn main() {
         .completer("exhaustive")
         .complete();
 
-    let matches = cli().get_matches();
-    if let Some(generator) = matches.get_one::<String>("generate") {
+    let cli_matches = cli().get_matches();
+    if let Some(generator) = cli_matches.get_one::<String>("generate") {
         let mut cmd = cli();
         eprintln!("Generating completion file for {generator}...");
 
@@ -129,14 +131,14 @@ fn main() {
         return;
     }
 
-    if matches.get_flag("tags") {
+    if cli_matches.get_flag("tags") {
         print_tags().unwrap();
         process::exit(0);
     }
 
     let regex_data = load_regex_pattern_data(JSON_DATA).unwrap();
 
-    let rarity = matches
+    let rarity = cli_matches
         .get_one::<String>("rarity")
         .map(|s| parse_rarity(s))
         .transpose()
@@ -144,19 +146,19 @@ fn main() {
 
     let filter: Filter = create_filter(
         rarity,
-        !matches.get_flag("disable-borderless"),
-        matches.get_one::<String>("include"),
-        matches.get_one::<String>("exclude"),
+        !cli_matches.get_flag("disable-borderless"),
+        cli_matches.get_one::<String>("include"),
+        cli_matches.get_one::<String>("exclude"),
     );
 
     let mut options: Options = Options {
-        only_text: matches.get_flag("only_text"),
+        only_text: cli_matches.get_flag("only_text"),
         format: OutputFormat::DEFAULT,
     };
 
-    options.format = get_format(&matches.get_one::<String>("format"));
+    options.format = get_format(&cli_matches.get_one::<String>("format"));
 
-    let input = matches.get_one::<String>("input").cloned();
+    let input = cli_matches.get_one::<String>("input").cloned();
     if input.is_none() {
         println!("{} (Version: {})", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"));
         println!("\n{}", env!("CARGO_PKG_DESCRIPTION"));
@@ -167,9 +169,13 @@ fn main() {
     }
 
     // Determine if the input is text or a file/directory path
-    if let Some(input) = matches.get_one::<String>("input") {
+    if let Some(input) = cli_matches.get_one::<String>("input") {
         let mut matches: Vec<Match> = Vec::new();
         identify(input, regex_data, &mut matches, &filter, &options).unwrap();
+        Sorter::default()
+            .key(cli_matches.get_one::<String>("key").unwrap())
+            .reverse(cli_matches.get_flag("reverse"))
+            .sort(&mut matches);
         output(&matches, &options)
     } else {
         eprintln!("Input as text or file/directory path expected. Run '--help' for usage.");
