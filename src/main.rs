@@ -11,7 +11,8 @@ use crate::options::{Options, OutputFormat};
 use crate::regex_pd::load_regex_pattern_data;
 use anyhow::{Context, Result};
 use clap::{Arg, Command};
-use clap_complete::aot::{generate, Generator, Shell};
+use clap_complete::aot::{generate, Generator};
+use clap_complete::Shell::{Bash, Elvish, Fish, PowerShell, Zsh};
 use human_panic::setup_panic;
 use std::{io, process};
 
@@ -113,10 +114,18 @@ fn main() {
         .complete();
 
     let matches = cli().get_matches();
-    if let Some(generator) = matches.get_one::<Shell>("generate") {
+    if let Some(generator) = matches.get_one::<String>("generate") {
         let mut cmd = cli();
         eprintln!("Generating completion file for {generator}...");
-        print_completions(*generator, &mut cmd);
+
+        match generator.as_str() {
+            "bash" => print_completions(Bash, &mut cmd),
+            "zsh" => print_completions(Zsh, &mut cmd),
+            "fish" => print_completions(Fish, &mut cmd),
+            "powershell" => print_completions(PowerShell, &mut cmd),
+            "elvish" => print_completions(Elvish, &mut cmd),
+            _ => eprintln!("Unknown shell specified."),
+        }
         return;
     }
 
