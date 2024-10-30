@@ -5,13 +5,13 @@ mod options;
 mod format;
 mod sorter;
 
-use crate::filter::{create_filter, parse_rarity, Filter};
+use crate::filter::Filter;
 use crate::format::{get_format, output};
 use crate::identifier::{identify, Match};
 use crate::options::{Options, OutputFormat};
 use crate::regex_pd::load_regex_pattern_data;
 use crate::sorter::Sorter;
-use anyhow::{Context, Result};
+use anyhow::Result;
 use clap::{Arg, Command};
 use clap_complete::aot::{generate, Generator};
 use clap_complete::Shell::{Bash, Elvish, Fish, PowerShell, Zsh};
@@ -58,13 +58,15 @@ fn cli() -> Command {
             Arg::new("include")
                 .short('i')
                 .long("include")
-                .help("Only show matches with these tags."),
+                .help("Only show matches with these tags.")
+                .default_value(""),
         )
         .arg(
             Arg::new("exclude")
                 .short('e')
                 .long("exclude")
-                .help("Exclude matches with these tags."),
+                .help("Exclude matches with these tags.")
+                .default_value(""),
         )
         .arg(
             Arg::new("only_text")
@@ -138,18 +140,12 @@ fn main() {
 
     let regex_data = load_regex_pattern_data(JSON_DATA).unwrap();
 
-    let rarity = cli_matches
-        .get_one::<String>("rarity")
-        .map(|s| parse_rarity(s))
-        .transpose()
-        .context("Invalid rarity range format. Expected 'min:max'").unwrap();
+    let filter = Filter::default()
+        .rarity(cli_matches.get_one::<String>("rarity").unwrap())
+        .borderless(!cli_matches.get_flag("disable-borderless"))
+        .include(cli_matches.get_one::<String>("include").unwrap_or(&String::from("")))
+        .exclude(cli_matches.get_one::<String>("exclude").unwrap_or(&String::from("")));
 
-    let filter: Filter = create_filter(
-        rarity,
-        !cli_matches.get_flag("disable-borderless"),
-        cli_matches.get_one::<String>("include"),
-        cli_matches.get_one::<String>("exclude"),
-    );
 
     let mut options: Options = Options {
         only_text: cli_matches.get_flag("only_text"),
