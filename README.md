@@ -66,7 +66,7 @@ Use `what --help` for more information.
 > Filtering by tags (by using --include etc.) and is not yet fully implemented but will come in the next releases.
 
 
-## 🙏 Thanks
+## 💖 Acknowledgement
 
 Big thanks to bee-san and everyone who worked on [pyWhat](https://github.com/bee-san/pyWhat/) for their amazing work on!
 Without them this project wouldn't exist. 
