@@ -1,16 +1,16 @@
-use crate::options::Options;
 use crate::regex_pd::PatternData;
 use crate::Filter;
 use anyhow::Context;
 use fancy_regex::Regex;
-use std::path::Path;
-use std::fs;
 use serde::Serialize;
+use std::fs;
+use std::path::Path;
 
 #[derive(Debug, Serialize)]
 pub struct Match {
     pub matched_on: String,
     pub name: String,
+    pub rarity: f32,
     pub description: Option<String>,
     pub link: Option<String>,
     pub exploit: Option<String>,
@@ -55,6 +55,7 @@ pub fn identify_text(text: String, regex_data: &Vec<PatternData>, matches: &mut 
                 Match {
                     matched_on: mat.unwrap().as_str().to_string(),
                     name: r.name.as_str().to_string(),
+                    rarity: r.rarity,
                     description: match &r.description {
                         Some(description) => Some(description.to_string()),
                         None => None
@@ -73,9 +74,9 @@ pub fn identify_text(text: String, regex_data: &Vec<PatternData>, matches: &mut 
     }
 }
 
-pub fn identify(input: &String, regex_data: Vec<PatternData>, matches: &mut Vec<Match>, filter: &Filter, options: &Options) -> anyhow::Result<()> {
+pub fn identify(input: &String, regex_data: Vec<PatternData>, matches: &mut Vec<Match>, filter: &Filter, only_text: bool) -> anyhow::Result<()> {
     let path = Path::new(input);
-    if !options.only_text && path.exists() {
+    if !only_text && path.exists() {
         if path.is_file() {
             identify_file(path, &regex_data, matches, &filter)?;
         } else if path.is_dir() {

@@ -1,6 +1,5 @@
 use std::cmp::min;
 use crate::identifier::Match;
-use crate::options::{Options, OutputFormat};
 use colored::*;
 use fancy_regex::Regex;
 use std::process;
@@ -28,6 +27,17 @@ struct MatchTableRow {
     name: String,
     #[tabled(rename = "Description")]
     description: String,
+}
+
+pub enum OutputFormat {
+    DEFAULT,
+    JSON,
+    PRETTY,
+    RAW // TODO: implement
+}
+
+pub struct Options {
+    pub format: OutputFormat,
 }
 
 pub fn output(matches: &Vec<Match>, options: &Options) {

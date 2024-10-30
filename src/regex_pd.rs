@@ -7,15 +7,17 @@ pub struct PatternData {
     pub name: String,
     pub regex: String,
     pub regex_no_anchor : Option<String>,
-    pub plural_name: bool,
+    // pub plural_name: bool,
     pub description: Option<String>,
     pub exploit: Option<String>,
-    pub rarity: f64,
+    pub rarity: f32,
     pub url: Option<String>,
-    pub tags: Option<Vec<String>>,
-    pub children: Option<ChildrenData>,
+    // pub tags: Option<Vec<String>>,
+    // pub children: Option<ChildrenData>,
 }
 
+/*
+TODO: Use this data to give users more specific data
 #[derive(Debug, Deserialize)]
 pub struct ChildrenData {
     pub path: String,
@@ -23,6 +25,7 @@ pub struct ChildrenData {
     pub method: String,
     pub deletion_pattern: Option<String>,
 }
+ */
 
 
 pub fn load_regex_pattern_data(json_string: &str) -> anyhow::Result<Vec<PatternData>, io::Error> {

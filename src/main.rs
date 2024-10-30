@@ -1,17 +1,18 @@
 mod regex_pd;
 mod filter;
 mod identifier;
-mod options;
 mod format;
+mod sorter;
 
-use crate::filter::{create_filter, parse_rarity, Filter};
-use crate::format::{get_format, output};
+use crate::filter::Filter;
+use crate::format::{get_format, output, Options, OutputFormat};
 use crate::identifier::{identify, Match};
-use crate::options::{Options, OutputFormat};
 use crate::regex_pd::load_regex_pattern_data;
-use anyhow::{Context, Result};
+use crate::sorter::Sorter;
+use anyhow::Result;
 use clap::{Arg, Command};
-use clap_complete::aot::{generate, Generator, Shell};
+use clap_complete::aot::{generate, Generator};
+use clap_complete::Shell::{Bash, Elvish, Fish, PowerShell, Zsh};
 use human_panic::setup_panic;
 use std::{io, process};
 
@@ -55,13 +56,15 @@ fn cli() -> Command {
             Arg::new("include")
                 .short('i')
                 .long("include")
-                .help("Only show matches with these tags."),
+                .help("Only show matches with these tags.")
+                .default_value(""),
         )
         .arg(
             Arg::new("exclude")
                 .short('e')
                 .long("exclude")
-                .help("Exclude matches with these tags."),
+                .help("Exclude matches with these tags.")
+                .default_value(""),
         )
         .arg(
             Arg::new("only_text")
@@ -91,6 +94,7 @@ fn cli() -> Command {
         )
         .arg(
             Arg::new("key")
+                .short('k')
                 .long("key")
                 .value_parser(["name", "rarity", "matched", "none"])
                 .default_value("none")
@@ -112,42 +116,43 @@ fn main() {
         .completer("exhaustive")
         .complete();
 
-    let matches = cli().get_matches();
-    if let Some(generator) = matches.get_one::<Shell>("generate") {
+    let cli_matches = cli().get_matches();
+    if let Some(generator) = cli_matches.get_one::<String>("generate") {
         let mut cmd = cli();
         eprintln!("Generating completion file for {generator}...");
-        print_completions(*generator, &mut cmd);
+
+        match generator.as_str() {
+            "bash" => print_completions(Bash, &mut cmd),
+            "zsh" => print_completions(Zsh, &mut cmd),
+            "fish" => print_completions(Fish, &mut cmd),
+            "powershell" => print_completions(PowerShell, &mut cmd),
+            "elvish" => print_completions(Elvish, &mut cmd),
+            _ => eprintln!("Unknown shell specified."),
+        }
         return;
     }
 
-    if matches.get_flag("tags") {
+    if cli_matches.get_flag("tags") {
         print_tags().unwrap();
         process::exit(0);
     }
 
     let regex_data = load_regex_pattern_data(JSON_DATA).unwrap();
 
-    let rarity = matches
-        .get_one::<String>("rarity")
-        .map(|s| parse_rarity(s))
-        .transpose()
-        .context("Invalid rarity range format. Expected 'min:max'").unwrap();
+    let filter = Filter::default()
+        .rarity(cli_matches.get_one::<String>("rarity").unwrap())
+        .borderless(!cli_matches.get_flag("disable-borderless"))
+        .include(cli_matches.get_one::<String>("include").unwrap_or(&String::from("")))
+        .exclude(cli_matches.get_one::<String>("exclude").unwrap_or(&String::from("")));
 
-    let filter: Filter = create_filter(
-        rarity,
-        !matches.get_flag("disable-borderless"),
-        matches.get_one::<String>("include"),
-        matches.get_one::<String>("exclude"),
-    );
 
     let mut options: Options = Options {
-        only_text: matches.get_flag("only_text"),
         format: OutputFormat::DEFAULT,
     };
 
-    options.format = get_format(&matches.get_one::<String>("format"));
+    options.format = get_format(&cli_matches.get_one::<String>("format"));
 
-    let input = matches.get_one::<String>("input").cloned();
+    let input = cli_matches.get_one::<String>("input").cloned();
     if input.is_none() {
         println!("{} (Version: {})", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"));
         println!("\n{}", env!("CARGO_PKG_DESCRIPTION"));
@@ -158,9 +163,13 @@ fn main() {
     }
 
     // Determine if the input is text or a file/directory path
-    if let Some(input) = matches.get_one::<String>("input") {
+    if let Some(input) = cli_matches.get_one::<String>("input") {
         let mut matches: Vec<Match> = Vec::new();
-        identify(input, regex_data, &mut matches, &filter, &options).unwrap();
+        identify(input, regex_data, &mut matches, &filter, cli_matches.get_flag("only_text")).unwrap();
+        Sorter::default()
+            .key(cli_matches.get_one::<String>("key").unwrap())
+            .reverse(cli_matches.get_flag("reverse"))
+            .sort(&mut matches);
         output(&matches, &options)
     } else {
         eprintln!("Input as text or file/directory path expected. Run '--help' for usage.");
