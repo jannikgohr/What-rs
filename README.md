@@ -49,8 +49,21 @@ Sometimes, you only care about seeing things which are related to AWS. Or bug bo
 
 You can filter output by using `what-rs --rarity 0.2:0.8 "thing/to/identify""`. Use `what-rs --help` to get more information.
 
+### 👽 Sorting, Exporting, and more!
+
+**Sorting** You can sort the output by using `what-rs -k rarity --reverse INPUT`.
+Use `what-rs --help` to get more information.
+
+**Exporting** You can export to json using `what-rs --format json` and results can be sent directly to a file using `what-rs --format json > outport.json`.
+
+**Borderless mode** `What-rs` has a special mode to match identifiable information within strings.
+By default, it is enabled in CLI but can be disabled using `what-rs --disable-borderless INPUT` or `what-rs -d INPUT`.
+
+Use `what --help` for more information.
+
+
 > [!IMPORTANT]
-> Filtering by tags (by using --include etc.) and sorting options are not yet fully implemented but will come in the next releases.
+> Filtering by tags (by using --include etc.) and is not yet fully implemented but will come in the next releases.
 
 
 ## 🙏 Thanks

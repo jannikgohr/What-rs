@@ -94,6 +94,7 @@ fn cli() -> Command {
         )
         .arg(
             Arg::new("key")
+                .short('k')
                 .long("key")
                 .value_parser(["name", "rarity", "matched", "none"])
                 .default_value("none")
