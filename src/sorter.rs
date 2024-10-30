@@ -1,7 +1,6 @@
 use std::cmp::Ordering;
 use crate::identifier::Match;
 
-#[derive(Debug)]
 pub enum SortKey {
     Name,
     Rarity,
@@ -15,12 +14,11 @@ pub struct Sorter {
 }
 
 impl Sorter {
-    #[inline]
     pub fn reverse(mut self, reverse: bool) -> Self {
         self.reverse = reverse;
         self
     }
-    #[inline]
+
     pub fn key(mut self, key: &String) -> Self {
         self.key = match key.as_str() {
             "name" => SortKey::Name,
@@ -34,8 +32,7 @@ impl Sorter {
         self
     }
 
-    #[inline]
-    pub fn sort(mut self, mut matches: &mut Vec<Match>) -> Self {
+    pub fn sort(self, matches: &mut Vec<Match>) -> Self {
 
         match self.key {
             SortKey::Name => {
