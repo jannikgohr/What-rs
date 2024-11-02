@@ -39,7 +39,7 @@ pub fn identify_file(path: &Path, matches: &mut Vec<Match>, filter: &Filter) -> 
 
 pub fn identify_text(text: String, matches: &mut Vec<Match>, filter: &Filter) {
     for r in DATA {
-        if r.rarity <= filter.min && r.rarity > filter.max {
+        if r.rarity <= filter.min || r.rarity > filter.max {
             continue
         }
         let regex_pattern = if filter.borderless {
