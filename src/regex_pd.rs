@@ -1,18 +1,17 @@
-use fancy_regex::Regex;
-use serde::Deserialize;
-use std::io;
+use serde::Serialize;
 
-#[derive(Debug, Deserialize)]
-pub struct PatternData {
-    pub name: String,
-    pub regex: String,
-    pub regex_no_anchor : Option<String>,
-    // pub plural_name: bool,
-    pub description: Option<String>,
-    pub exploit: Option<String>,
+#[derive(Serialize, Debug, Clone)]
+pub(crate) struct PatternData {
+    pub name: &'static str,
+    pub regex: &'static str,
+    #[serde(skip_deserializing)]
+    pub regex_no_anchor: &'static str,
+    pub plural_name: bool,
+    pub description: Option<&'static str>,
+    pub exploit: Option<&'static str>,
     pub rarity: f32,
-    pub url: Option<String>,
-    // pub tags: Option<Vec<String>>,
+    pub url: Option<&'static str>,
+    pub tags: &'static [&'static str],
     // pub children: Option<ChildrenData>,
 }
 
@@ -27,22 +26,6 @@ pub struct ChildrenData {
 }
  */
 
+// this is `pub const DATA: [PatternData; 129] = ...`
+include!(concat!(env!("OUT_DIR"), "/data.rs"));
 
-pub fn load_regex_pattern_data(json_string: &str) -> anyhow::Result<Vec<PatternData>, io::Error> {
-
-    let mut json_data: Vec<PatternData> = serde_json::from_str(&json_string)?;
-
-    for pattern in &mut json_data {
-        // Regex to remove `^` not within `[]` or escaped
-        let re_start = Regex::new(r"(?<!\\)\^(?![^\[\]]*(?<!\\)\])").unwrap();
-        // Regex to remove `$` not within `[]` or escaped
-        let re_end = Regex::new(r"(?<!\\)\$(?![^\[\]]*(?<!\\)\])").unwrap();
-
-        // Apply the regex replacements
-        let regex_no_start_anchor = re_start.replace_all(&pattern.regex, "");
-        let regex_no_anchor = re_end.replace_all(&regex_no_start_anchor, "");
-        pattern.regex_no_anchor = Option::from(regex_no_anchor.to_string());
-    }
-
-    Ok(json_data)
-}

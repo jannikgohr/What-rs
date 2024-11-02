@@ -7,7 +7,6 @@ mod sorter;
 use crate::filter::Filter;
 use crate::format::{get_format, output, Options, OutputFormat};
 use crate::identifier::{identify, Match};
-use crate::regex_pd::load_regex_pattern_data;
 use crate::sorter::Sorter;
 use anyhow::Result;
 use clap::{Arg, Command};
@@ -137,8 +136,6 @@ fn main() {
         process::exit(0);
     }
 
-    let regex_data = load_regex_pattern_data(JSON_DATA).unwrap();
-
     let filter = Filter::default()
         .rarity(cli_matches.get_one::<String>("rarity").unwrap())
         .borderless(!cli_matches.get_flag("disable-borderless"))
@@ -165,7 +162,7 @@ fn main() {
     // Determine if the input is text or a file/directory path
     if let Some(input) = cli_matches.get_one::<String>("input") {
         let mut matches: Vec<Match> = Vec::new();
-        identify(input, regex_data, &mut matches, &filter, cli_matches.get_flag("only_text")).unwrap();
+        identify(input, &mut matches, &filter, cli_matches.get_flag("only_text")).unwrap();
         Sorter::default()
             .key(cli_matches.get_one::<String>("key").unwrap())
             .reverse(cli_matches.get_flag("reverse"))
