@@ -24,8 +24,6 @@ const HELP_TEMPLATE_FORMAT: &str = "\
 {all-args}{after-help}
 ";
 
-const JSON_DATA: &str = include_str!("../data/regex.json");
-
 fn cli() -> Command {
     Command::new(env!("CARGO_PKG_NAME"))
         .version(env!("CARGO_PKG_VERSION"))
