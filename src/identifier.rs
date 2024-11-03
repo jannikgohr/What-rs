@@ -1,6 +1,6 @@
 use crate::regex_pd::DATA;
 use crate::Filter;
-use fancy_regex::Regex;
+use regex::Regex;
 use serde::Serialize;
 use std::fs;
 use std::path::Path;
@@ -52,7 +52,7 @@ pub fn identify_text(text: String, matches: &mut Vec<Match>, filter: &Filter) {
         for mat in re.find_iter(&*text) {
             matches.push(
                 Match {
-                    matched_on: mat.unwrap().as_str().to_string(),
+                    matched_on: mat.as_str().to_string(),
                     name: r.name.parse().unwrap(),
                     rarity: r.rarity,
                     description: match &r.description {

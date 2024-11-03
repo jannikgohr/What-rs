@@ -108,7 +108,6 @@ fn c_print_pretty(matches: &Vec<Match>) {
     let rows = matches_to_table_rows(matches);
     let mut table = Table::new(rows);
     let (width, _height) = get_terminal_size();
-    println!("{}", width);
     table
         .with(Style::modern())
         .with(Colorization::exact([Color::FG_MAGENTA], Rows::first()))
@@ -183,7 +182,6 @@ fn matches_to_table_rows(matches: &Vec<Match>) -> Vec<MatchTableRow> {
             desc += link.clone().as_str();
             desc += &*m.matched_on.as_str();
             description = parse_wikitext(&*desc);
-            println!("{} ({})", &description, description.len())
         } else {
             description = String::from("None");
         }

@@ -12,6 +12,7 @@ pub(crate) struct PatternData {
     pub rarity: f32,
     pub url: Option<&'static str>,
     pub tags: &'static [&'static str],
+    pub uses_non_standard_regex: bool,
     // pub children: Option<ChildrenData>,
 }
 

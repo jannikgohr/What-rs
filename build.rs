@@ -17,6 +17,8 @@ struct PatternData {
     rarity: f32,
     url: Option<&'static str>,
     tags: Vec<&'static str>,
+    #[serde(skip_deserializing)]
+    uses_non_standard_regex: bool,
 }
 
 fn main() {
@@ -31,8 +33,21 @@ fn main() {
             .expect("can't compile for regex_no_anchor")
             .replace(&d.regex_no_anchor, "")
             .to_string();
+        match Regex::new(&d.regex) {
+            Ok(_) => {
+                d.uses_non_standard_regex = false;
+            }
+            Err(_) => {
+                d.uses_non_standard_regex = true;
+            }
+        }
     });
 
+    data.sort_by(|a, b| {
+        a.name.cmp(&b.name)
+    });
+
+    // TODO support non standard regex, currently crashes sometimes if we dont filter
     data.retain(|r| Regex::new(&r.regex).is_ok() && Regex::new(&r.regex_no_anchor).is_ok());
 
     let mut data_str = format!("{:?}", data);
