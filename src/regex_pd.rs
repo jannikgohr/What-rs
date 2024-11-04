@@ -5,9 +5,6 @@ use once_cell::sync::Lazy;
 #[derive(Serialize, Debug, Clone)]
 pub(crate) struct PatternData {
     pub name: &'static str,
-    //pub regex: &'static str,
-    //#[serde(skip_deserializing)]
-    //pub regex_no_anchor: &'static str,
     pub plural_name: bool,
     pub description: Option<&'static str>,
     pub exploit: Option<&'static str>,
