@@ -1,6 +1,5 @@
-use crate::regex_pd::DATA;
+use crate::regex_pd::{DATA, REGEX, REGEX_NO_ANCHOR};
 use crate::Filter;
-use regex::Regex;
 use serde::Serialize;
 use std::fs;
 use std::path::Path;
@@ -38,18 +37,17 @@ pub fn identify_file(path: &Path, matches: &mut Vec<Match>, filter: &Filter) -> 
 }
 
 pub fn identify_text(text: String, matches: &mut Vec<Match>, filter: &Filter) {
-    for r in DATA {
-        if r.rarity <= filter.min || r.rarity > filter.max {
+    for (i, r) in DATA.iter().enumerate() {
         if r.rarity < filter.min || r.rarity > filter.max {
             continue
         }
-        let regex_pattern = if filter.borderless {
-            &r.regex_no_anchor
+        let re = if filter.borderless {
+            &REGEX_NO_ANCHOR[i]
         } else {
-            &r.regex
+            &REGEX[i]
         };
         // Find all matches
-        let re = Regex::new(&regex_pattern).unwrap();
+        //let re = Regex::new(&regex_pattern).unwrap();
         for mat in re.find_iter(&*text) {
             matches.push(
                 Match {

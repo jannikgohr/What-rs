@@ -2,10 +2,10 @@ use fancy_regex::Regex as Fancy;
 use regex::Regex;
 use serde::Deserialize;
 use std::fmt::Write;
-use std::{env, fs, path::Path};
+use std::{env, fmt, fs, path::Path};
 
 #[allow(dead_code)]
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize)]
 struct PatternData {
     name: String,
     regex: String,
@@ -19,6 +19,22 @@ struct PatternData {
     tags: Vec<&'static str>,
     #[serde(skip_deserializing)]
     uses_non_standard_regex: bool,
+}
+
+
+impl fmt::Debug for PatternData {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        f.debug_struct("PatternData")
+            .field("name", &self.name)
+            .field("plural_name", &self.plural_name)
+            .field("description", &self.description)
+            .field("exploit", &self.exploit)
+            .field("rarity", &self.rarity)
+            .field("url", &self.url)
+            .field("tags", &self.tags)
+            // .field("uses_non_standard_regex", &self.uses_non_standard_regex) TODO: use it
+            .finish()
+    }
 }
 
 fn main() {

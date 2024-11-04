@@ -27,6 +27,7 @@ regex = "1.11.1"
 colored = "2.1.0"
 tabled = { version = "0.16.0", features = ["ansi"] }
 terminal_size = "0.4.0"
+once_cell = "1.20.2"
 
 [dev-dependencies]
 assert_cmd = "2.0.16"
