@@ -1,4 +1,4 @@
-use crate::regex_pd::{DATA, REGEX, REGEX_NO_ANCHOR};
+use crate::regex_pd::{PATTERN_DATA, REGEX, REGEX_NO_ANCHOR};
 use crate::Filter;
 use serde::Serialize;
 use std::fs;
@@ -37,7 +37,7 @@ pub fn identify_file(path: &Path, matches: &mut Vec<Match>, filter: &Filter) -> 
 }
 
 pub fn identify_text(text: String, matches: &mut Vec<Match>, filter: &Filter) {
-    for (i, r) in DATA.iter().enumerate() {
+    for (i, r) in PATTERN_DATA.iter().enumerate() {
         if r.rarity < filter.min || r.rarity > filter.max {
             continue
         }

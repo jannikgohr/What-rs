@@ -90,10 +90,10 @@ fn main() {
 
     let count = data.len();
     let final_str = format!(
-        "pub const DATA: [PatternData; {count}] = {data_str};"
+        "pub const PATTERN_DATA: [PatternData; {count}] = {data_str};"
     );
     let out_dir = env::var_os("OUT_DIR").unwrap();
-    let dest_path = Path::new(&out_dir).join("data.rs");
+    let dest_path = Path::new(&out_dir).join("pattern_data.rs");
     fs::write(dest_path, final_str).unwrap();
 
     let mut final_str = format!(

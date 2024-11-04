@@ -30,8 +30,8 @@ pub struct ChildrenData {
  */
 
 const _1: [PatternData; 0] = []; // so rust-analyzer won't complain about unused imports
-// this is `pub const DATA: [PatternData; 129] = ...`
-include!(concat!(env!("OUT_DIR"), "/data.rs"));
+// this is `pub const PATTERN_DATA: [PatternData; 129] = ...`
+include!(concat!(env!("OUT_DIR"), "/pattern_data.rs"));
 
 const _2: [Lazy<Regex>; 0] = []; // so rust-analyzer won't complain about unused imports
 // this is `pub static REGEX: [Lazy<Regex>; 129] = ...`
