@@ -3,6 +3,10 @@ use crate::Filter;
 use serde::Serialize;
 use std::fs;
 use std::path::Path;
+use std::sync::{Arc, Mutex};
+use once_cell::sync::Lazy;
+use rayon::prelude::*;
+use regex::Regex;
 
 #[derive(Debug, Serialize)]
 pub struct Match {
@@ -37,20 +41,29 @@ pub fn identify_file(path: &Path, matches: &mut Vec<Match>, filter: &Filter) -> 
 }
 
 pub fn identify_text(text: String, matches: &mut Vec<Match>, filter: &Filter) {
-    for (i, r) in PATTERN_DATA.iter().enumerate() {
-        if r.rarity < filter.min || r.rarity > filter.max {
-            continue
-        }
-        let re = if filter.borderless {
-            &REGEX_NO_ANCHOR[i]
-        } else {
-            &REGEX[i]
-        };
-        // Find all matches
-        //let re = Regex::new(&regex_pattern).unwrap();
-        for mat in re.find_iter(&*text) {
-            matches.push(
-                Match {
+    let text = Arc::new(text);
+    let matches_arc = Arc::new(Mutex::new(Vec::new()));
+
+    println!("Default thread pool size: {}", rayon::current_num_threads());
+
+    PATTERN_DATA
+        .par_iter()
+        .enumerate()
+        .for_each(|(i, r)| {
+            // Check the filter for the current pattern
+            if r.rarity < filter.min || r.rarity > filter.max {
+                return;
+            }
+
+            let re: &Lazy<Regex> = if filter.borderless {
+                &REGEX_NO_ANCHOR[i]
+            } else {
+                &REGEX[i]
+            };
+
+            // Find all matches for this pattern
+            for mat in re.find_iter(&text) {
+                let match_obj = Match {
                     matched_on: mat.as_str().to_string(),
                     name: r.name.parse().unwrap(),
                     rarity: r.rarity,
@@ -66,10 +79,21 @@ pub fn identify_text(text: String, matches: &mut Vec<Match>, filter: &Filter) {
                         Some(exploit) => Some(exploit.to_string()),
                         None => None
                     },
-                }
-            );
-        }
-    }
+                };
+
+                // Push the match object to the shared vector
+                let mut matches_lock = matches_arc.lock().unwrap();
+                matches_lock.push(match_obj);
+            }
+        });
+
+    // Move collected matches from matches_arc to the output vector
+    let results = Arc::try_unwrap(matches_arc)
+        .expect("Failed to unwrap Arc") // We ensure no other thread is holding a reference
+        .into_inner()
+        .expect("Failed to lock Mutex");
+
+    matches.extend(results);
 }
 
 pub fn identify(input: &String, matches: &mut Vec<Match>, filter: &Filter, only_text: bool) -> anyhow::Result<()> {
