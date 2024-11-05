@@ -1,0 +1,45 @@
+name: Check Version Increment
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  check-version:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Git and Rust
+        run: |
+          sudo apt-get install -y git
+          rustup update
+
+      - name: Get Current Version from Cargo.toml
+        id: current_version
+        run: |
+          current_version=$(grep '^version' Cargo.toml | head -1 | sed 's/version = "\(.*\)"/\1/')
+          echo "current_version=$current_version" >> $GITHUB_ENV
+
+      - name: Get Previous Tag
+        id: previous_tag
+        run: |
+          previous_tag=$(git describe --tags --abbrev=0 HEAD^)
+          echo "previous_tag=$previous_tag" >> $GITHUB_ENV
+
+      - name: Get Version from Previous Tag
+        id: previous_version
+        run: |
+          previous_version=$(git show ${{ env.previous_tag }}:Cargo.toml | grep '^version' | head -1 | sed 's/version = "\(.*\)"/\1/')
+          echo "previous_version=$previous_version" >> $GITHUB_ENV
+
+      - name: Check Version Increment
+        run: |
+          if [ "$current_version" = "$previous_version" ]; then
+            echo "Error: Version in Cargo.toml has not been incremented!"
+            exit 1
+          else
+            echo "Version increment check passed."
+          fi
