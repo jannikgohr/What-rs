@@ -1,18 +1,24 @@
 [package]
 name = "What-rs"
-version = "0.2.0"
+version = "0.2.2"
 edition = "2021"
 authors = ["Jannik Gohr <JannikG-Dev@pm.me>"]
-description = """What-rs - Identify what something is!\n
+description = """Identify what something is!
 A pyWhat reimplementation in Rust."""
 homepage = "https://github.com/jannikgohr/What-rs"
+repository = "https://github.com/jannikgohr/What-rs"
+license = "MIT OR Apache-2.0"
+readme = "README.md"
+exclude = [".github"]
+keywords = ["regex", "pattern-matching", "text-analysis", "identifier", "CLI"]
+categories = ["command-line-utilities", "text-processing"]
 
 [profile.release]
 codegen-units = 1
 lto = true
 
 [[bin]]
-name = "What-rs"
+name = "what-rs"
 path = "src/main.rs"
 
 [dependencies]

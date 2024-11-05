@@ -17,6 +17,7 @@ use std::{io, process};
 
 const HELP_TEMPLATE_FORMAT: &str = "\
 {before-help}{name} {version}
+
 {about-with-newline}
 {author-with-newline}
 {usage-heading} {usage}
