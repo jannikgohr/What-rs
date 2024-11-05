@@ -13,7 +13,7 @@ fn find_content_in_directory() -> Result<(), Box<dyn std::error::Error>> {
     let file = nested_dir.child("sample.txt");
     file.write_str("0x52908400098527886E0F7030069857D2E4169EE7")?;
 
-    let mut cmd = Command::cargo_bin("What-rs")?;
+    let mut cmd = Command::cargo_bin("what-rs")?;
     cmd.arg(temp_dir.path());
     cmd.assert()
         .success()
@@ -27,7 +27,7 @@ fn find_content_in_file() -> Result<(), Box<dyn std::error::Error>> {
     let file = assert_fs::NamedTempFile::new("sample.txt")?;
     file.write_str("0x52908400098527886E0F7030069857D2E4169EE7")?;
 
-    let mut cmd = Command::cargo_bin("What-rs")?;
+    let mut cmd = Command::cargo_bin("what-rs")?;
     cmd.arg("0x52908400098527886E0F7030069857D2E4169EE7");
     cmd.assert()
         .success()
@@ -38,7 +38,7 @@ fn find_content_in_file() -> Result<(), Box<dyn std::error::Error>> {
 
 #[test]
 fn find_content_in_text() -> Result<(), Box<dyn std::error::Error>> {
-    let mut cmd = Command::cargo_bin("What-rs")?;
+    let mut cmd = Command::cargo_bin("what-rs")?;
     cmd.arg("0x52908400098527886E0F7030069857D2E4169EE7");
     cmd.assert()
         .success()
@@ -49,7 +49,7 @@ fn find_content_in_text() -> Result<(), Box<dyn std::error::Error>> {
 
 #[test]
 fn find_borderless_content_in_text() -> Result<(), Box<dyn std::error::Error>> {
-    let mut cmd = Command::cargo_bin("What-rs")?;
+    let mut cmd = Command::cargo_bin("what-rs")?;
     cmd.arg("0x52908400098527886E0F7030069857D2E4169EE7");
     cmd.assert()
         .success()
@@ -60,7 +60,7 @@ fn find_borderless_content_in_text() -> Result<(), Box<dyn std::error::Error>> {
 
 #[test]
 fn dont_find_bordered_content_in_text() -> Result<(), Box<dyn std::error::Error>> {
-    let mut cmd = Command::cargo_bin("What-rs")?;
+    let mut cmd = Command::cargo_bin("what-rs")?;
     cmd.arg("-d").arg("0x52908400098527886E0F7030069857D2E4169EE7");
     cmd.assert()
         .success()
