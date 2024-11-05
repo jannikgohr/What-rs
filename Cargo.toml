@@ -9,7 +9,7 @@ homepage = "https://github.com/jannikgohr/What-rs"
 repository = "https://github.com/jannikgohr/What-rs"
 license = "MIT OR Apache-2.0"
 readme = "README.md"
-exclude = [".github"]
+exclude = ["/.github", "/.idea", "/tests"]
 keywords = ["regex", "pattern-matching", "text-analysis", "identifier", "CLI"]
 categories = ["command-line-utilities", "text-processing"]
 
