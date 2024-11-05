@@ -44,8 +44,6 @@ pub fn identify_text(text: String, matches: &mut Vec<Match>, filter: &Filter) {
     let text = Arc::new(text);
     let matches_arc = Arc::new(Mutex::new(Vec::new()));
 
-    println!("Default thread pool size: {}", rayon::current_num_threads());
-
     PATTERN_DATA
         .par_iter()
         .enumerate()
