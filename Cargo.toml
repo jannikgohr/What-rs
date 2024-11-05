@@ -1,5 +1,5 @@
 [package]
-name = "What-rs"
+name = "what-rs"
 version = "0.2.2"
 edition = "2021"
 authors = ["Jannik Gohr <JannikG-Dev@pm.me>"]
