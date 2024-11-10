@@ -1,12 +1,13 @@
 ﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
-  <Package Name="What-rs" Language="1033" Version="1.0.0" Manufacturer="Jannik Gohr"
+  <Package Name="What-rs" Language="1033" Version="0.2.3" Manufacturer="Jannik Gohr"
   UpgradeCode="A2D80FC7-3719-4D01-AC87-61AE9DA97AB8" Scope="perUser">
-    
 
-    <!-- Files and features -->
+    <MediaTemplate EmbedCab="yes" />
+
+    <!-- Files and environment variables -->
     <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
       <Component Id="what_rs_component" Guid="142A1E0C-DD0C-4D6D-BBAA-769168DE8DD8">
-        <File Id="what_rs_exe" Source=".\target\release\what-rs.exe" KeyPath="yes" />
+        <File Id="what_rs_exe" Source="..\target\release\what-rs.exe" KeyPath="yes" />
         <Environment Id="PathUpdate" Name="PATH" Value="[INSTALLFOLDER]" Permanent="no" Part="last" Action="set" />
       </Component>
     </ComponentGroup>
