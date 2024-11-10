@@ -40,6 +40,7 @@ jobs:
           - stable
     steps:
       - uses: actions/checkout@v3
+
       - name: Build binary
         uses: houseabsolute/actions-rust-cross@v0
         with:
@@ -48,17 +49,33 @@ jobs:
           toolchain: ${{ matrix.toolchain }}
           args: "--locked --release"
           strip: true
+
       - name: Rename binary (linux and macos)
         run: mv target/${{ matrix.platform.target }}/release/what-rs target/${{ matrix.platform.target }}/release/${{ matrix.platform.bin }}
         if: matrix.platform.os_name != 'Windows-x86_64'
+
       - name: Rename binary (windows)
         run: mv target/${{ matrix.platform.target }}/release/what-rs.exe target/${{ matrix.platform.target }}/release/${{ matrix.platform.bin }}
         if: matrix.platform.os_name == 'Windows-x86_64'
+
+      - name: Build MSI installer (Windows only)
+        if: matrix.platform.os_name == 'Windows-x86_64'
+        run: |
+          # Install WiX Toolset using .NET CLI
+          dotnet tool install --global wix --version 5.0.*
+          # Build the MSI installer using Wix Toolset
+          wix build ./wix/windows-installer.wxs -o ./wix/what-rs-amd64-windows-installer.msi
+          # Generate SHA-256 checksum for the MSI file
+          shasum -a 256 ./wix/what-rs-amd64-windows-installer.msi | cut -d ' ' -f 1 > ./wix/what-rs-amd64-windows-installer.msi.sha256
+
       - name: Generate SHA-256
         run: shasum -a 256 target/${{ matrix.platform.target }}/release/${{ matrix.platform.bin }} | cut -d ' ' -f 1 > target/${{ matrix.platform.target }}/release/${{ matrix.platform.bin }}.sha256
+
       - name: Release binary and SHA-256 checksum to GitHub
         uses: softprops/action-gh-release@v1
         with:
           files: |
             target/${{ matrix.platform.target }}/release/${{ matrix.platform.bin }}
             target/${{ matrix.platform.target }}/release/${{ matrix.platform.bin }}.sha256
+            ./wix/what-rs-amd64-windows-installer.msi
+            ./wix/what-rs-amd64-windows-installer.msi.sha256
