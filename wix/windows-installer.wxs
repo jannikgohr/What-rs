@@ -2,9 +2,8 @@
   <Package Name="What-rs" Language="1033" Version="0.2.3" Manufacturer="Jannik Gohr"
   UpgradeCode="A2D80FC7-3719-4D01-AC87-61AE9DA97AB8" Scope="perUser">
 
-    <MediaTemplate EmbedCab="yes" />
+  <MediaTemplate EmbedCab="yes" />
 
-    <!-- Files and environment variables -->
     <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
       <Component Id="what_rs_component" Guid="142A1E0C-DD0C-4D6D-BBAA-769168DE8DD8">
         <File Id="what_rs_exe" Source="..\target\release\what-rs.exe" KeyPath="yes" />
@@ -12,11 +11,10 @@
       </Component>
     </ComponentGroup>
 
-    <!-- Feature setup -->
     <Feature Id="ProductFeature" Title="what-rs" Level="1">
       <ComponentGroupRef Id="ProductComponents" />
     </Feature>
-  
+
       <StandardDirectory Id="LocalAppDataFolder">
         <Directory Id="ProgramsFolder" Name="Programs">
           <Directory Id="INSTALLFOLDER" Name="what-rs" />
