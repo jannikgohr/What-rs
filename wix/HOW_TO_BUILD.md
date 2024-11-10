@@ -1,5 +1,5 @@
 If you want to build an MSI Windows installer run 
-`wix build ./wix/windows-installer.wxs -o ./wix/what-rs-amd64-windows-installer.msi`
+`wix build .\wix\windows-installer.wxs -o .\wix\what-rs-amd64-windows-installer.msi -d EXE_FILE_PATH=./target/release/what-rs.exe`
 at the project root.
 
 A release version of what-rs needs to be built before you can do this.
