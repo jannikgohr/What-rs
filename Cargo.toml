@@ -5,8 +5,8 @@ edition = "2021"
 authors = ["Jannik Gohr <JannikG-Dev@pm.me>"]
 description = """Identify what something is!
 A pyWhat reimplementation in Rust."""
-homepage = "https://github.com/jannikgohr/What-rs"
-repository = "https://github.com/jannikgohr/What-rs"
+homepage = "https://github.com/jannikgohr/what-rs"
+repository = "https://github.com/jannikgohr/what-rs"
 license = "MIT OR Apache-2.0"
 readme = "README.md"
 exclude = ["/.github", "/.idea", "tests"]

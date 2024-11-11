@@ -1,14 +1,14 @@
 <!--suppress HtmlDeprecatedAttribute -->
 <div align="center" style="text-align: center;">
 
-# What-rs
+# what-rs
 
 _The easiest way to identify anything_ 🔎
 
 A reimplementation of the popular [pyWhat](https://github.com/bee-san/pyWhat/)
 
-[![build and release](https://github.com/jannikgohr/What-rs/actions/workflows/multi-platform-release.yml/badge.svg)](https://github.com/jannikgohr/What-rs/releases)
-[![build and release](https://github.com/jannikgohr/What-rs/actions/workflows/test.yml/badge.svg)](https://github.com/jannikgohr/What-rs/actions/workflows/test.yml)
+[![build and release](https://github.com/jannikgohr/what-rs/actions/workflows/multi-platform-release.yml/badge.svg)](https://github.com/jannikgohr/what-rs/releases)
+[![build and release](https://github.com/jannikgohr/what-rs/actions/workflows/test.yml/badge.svg)](https://github.com/jannikgohr/what-rs/actions/workflows/test.yml)
 
 </div>
 
@@ -56,7 +56,7 @@ Use `what-rs --help` to get more information.
 
 **Exporting** You can export to json using `what-rs --format json` and results can be sent directly to a file using `what-rs --format json > outport.json`.
 
-**Borderless mode** `What-rs` has a special mode to match identifiable information within strings.
+**Borderless mode** `what-rs` has a special mode to match identifiable information within strings.
 By default, it is enabled in CLI but can be disabled using `what-rs --disable-borderless INPUT` or `what-rs -d INPUT`.
 
 Use `what --help` for more information.
