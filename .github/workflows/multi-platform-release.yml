@@ -77,5 +77,5 @@ jobs:
           files: |
             target/${{ matrix.platform.target }}/release/${{ matrix.platform.bin }}
             target/${{ matrix.platform.target }}/release/${{ matrix.platform.bin }}.sha256
-            ./wix/what-rs-amd64-windows-installer.msi
-            ./wix/what-rs-amd64-windows-installer.msi.sha256
+            wix/what-rs-amd64-windows-installer.msi
+            wix/what-rs-amd64-windows-installer.msi.sha256
