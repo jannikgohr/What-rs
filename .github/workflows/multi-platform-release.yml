@@ -64,9 +64,9 @@ jobs:
           # Install WiX Toolset using .NET CLI
           dotnet tool install --global wix --version 5.0.*
           # Build the MSI installer using Wix Toolset
-          wix build wix/windows-installer.wxs -o wix/what-rs-amd64-windows-installer.msi -d EXE_FILE_PATH=target/${{ matrix.platform.target }}/release/${{ matrix.platform.bin }}
+          wix build packages/wix/windows-installer.wxs -o target/wix/what-rs-amd64-windows-installer.msi -d EXE_FILE_PATH=target/${{ matrix.platform.target }}/release/${{ matrix.platform.bin }}
           # Generate SHA-256 checksum for the MSI file
-          shasum -a 256 ./wix/what-rs-amd64-windows-installer.msi | cut -d ' ' -f 1 > ./wix/what-rs-amd64-windows-installer.msi.sha256
+          shasum -a 256 target//wix/what-rs-amd64-windows-installer.msi | cut -d ' ' -f 1 > target/wix/what-rs-amd64-windows-installer.msi.sha256
 
       - name: Generate SHA-256
         run: shasum -a 256 target/${{ matrix.platform.target }}/release/${{ matrix.platform.bin }} | cut -d ' ' -f 1 > target/${{ matrix.platform.target }}/release/${{ matrix.platform.bin }}.sha256
@@ -77,5 +77,5 @@ jobs:
           files: |
             target/${{ matrix.platform.target }}/release/${{ matrix.platform.bin }}
             target/${{ matrix.platform.target }}/release/${{ matrix.platform.bin }}.sha256
-            wix/what-rs-amd64-windows-installer.msi
-            wix/what-rs-amd64-windows-installer.msi.sha256
+            target/wix/what-rs-amd64-windows-installer.msi
+            target/wix/what-rs-amd64-windows-installer.msi.sha256
