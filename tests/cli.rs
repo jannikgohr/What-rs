@@ -1,8 +1,7 @@
 use assert_cmd::prelude::*;
+use assert_fs::prelude::*;
 use predicates::prelude::*;
 use std::process::Command;
-use assert_fs::prelude::*;
-
 
 #[test]
 fn find_content_in_directory() -> Result<(), Box<dyn std::error::Error>> {
@@ -65,6 +64,61 @@ fn dont_find_bordered_content_in_text() -> Result<(), Box<dyn std::error::Error>
     cmd.assert()
         .success()
         .stdout(predicate::str::contains("Turkish Identification Number").not());
+
+    Ok(())
+}
+
+#[test]
+fn find_url() -> Result<(), Box<dyn std::error::Error>> {
+    let mut cmd = Command::cargo_bin("what-rs")?;
+    cmd.arg("test.com");
+    cmd.assert()
+        .success()
+        .stdout(predicate::str::contains("Uniform Resource Locator (URL)"));
+
+    Ok(())
+}
+
+#[test]
+fn find_url_if_in_included() -> Result<(), Box<dyn std::error::Error>> {
+    let mut cmd = Command::cargo_bin("what-rs")?;
+    cmd.arg("-i").arg("url").arg("test.com");
+    cmd.assert()
+        .success()
+        .stdout(predicate::str::contains("Uniform Resource Locator (URL)"));
+
+    Ok(())
+}
+
+#[test]
+fn find_url_if_unrelated_in_excluded() -> Result<(), Box<dyn std::error::Error>> {
+    let mut cmd = Command::cargo_bin("what-rs")?;
+    cmd.arg("-e").arg("bitcoin").arg("test.com");
+    cmd.assert()
+        .success()
+        .stdout(predicate::str::contains("Uniform Resource Locator (URL)"));
+
+    Ok(())
+}
+
+#[test]
+fn dont_find_url_if_in_excluded() -> Result<(), Box<dyn std::error::Error>> {
+    let mut cmd = Command::cargo_bin("what-rs")?;
+    cmd.arg("-e").arg("url").arg("test.com");
+    cmd.assert()
+        .success()
+        .stdout(predicate::str::contains("Uniform Resource Locator (URL)").not());
+
+    Ok(())
+}
+
+#[test]
+fn dont_find_url_if_unrelated_in_included() -> Result<(), Box<dyn std::error::Error>> {
+    let mut cmd = Command::cargo_bin("what-rs")?;
+    cmd.arg("-i").arg("bitcoin").arg("test.com");
+    cmd.assert()
+        .success()
+        .stdout(predicate::str::contains("Uniform Resource Locator (URL)").not());
 
     Ok(())
 }
