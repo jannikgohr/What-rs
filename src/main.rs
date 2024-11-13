@@ -8,12 +8,13 @@ use crate::filter::Filter;
 use crate::format::{get_format, output, Options, OutputFormat};
 use crate::identifier::{identify, Match};
 use crate::sorter::Sorter;
-use anyhow::Result;
+use crate::regex_pd::TAGS;
 use clap::{Arg, Command};
 use clap_complete::aot::{generate, Generator};
 use clap_complete::Shell::{Bash, Elvish, Fish, PowerShell, Zsh};
 use human_panic::setup_panic;
 use std::{io, process};
+use colored::Colorize;
 
 const HELP_TEMPLATE_FORMAT: &str = "\
 {before-help}{name} {version}
@@ -131,8 +132,23 @@ fn main() {
     }
 
     if cli_matches.get_flag("tags") {
-        print_tags().unwrap();
+        print_tags();
         process::exit(0);
+    }
+
+    let input = cli_matches.get_one::<String>("input").cloned();
+    if input.is_none() {
+        if cli_matches.args_present() {
+            cli().help_template("{usage-heading} {usage}\n\n{all-args}{after-help}")
+                .print_help().unwrap();
+        } else {
+            println!("{} (Version: {})", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"));
+            println!("\n{}", env!("CARGO_PKG_DESCRIPTION"));
+            println!("Made by {}", env!("CARGO_PKG_AUTHORS"));
+            println!("For more information see {}", env!("CARGO_PKG_HOMEPAGE"));
+            eprintln!("\nRun '--help' for usage.");
+        }
+        process::exit(1);
     }
 
     let filter = Filter::default()
@@ -141,24 +157,12 @@ fn main() {
         .include(cli_matches.get_one::<String>("include").unwrap_or(&String::from("")))
         .exclude(cli_matches.get_one::<String>("exclude").unwrap_or(&String::from("")));
 
-
     let mut options: Options = Options {
         format: OutputFormat::DEFAULT,
     };
 
     options.format = get_format(&cli_matches.get_one::<String>("format"));
 
-    let input = cli_matches.get_one::<String>("input").cloned();
-    if input.is_none() {
-        println!("{} (Version: {})", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"));
-        println!("\n{}", env!("CARGO_PKG_DESCRIPTION"));
-        println!("Made by {}", env!("CARGO_PKG_AUTHORS"));
-        println!("For more information see {}", env!("CARGO_PKG_HOMEPAGE"));
-        eprintln!("\nRun '--help' for usage.");
-        process::exit(1);
-    }
-
-    // Determine if the input is text or a file/directory path
     if let Some(input) = cli_matches.get_one::<String>("input") {
         let mut matches: Vec<Match> = Vec::new();
         identify(input, &mut matches, &filter, cli_matches.get_flag("only_text")).unwrap();
@@ -177,12 +181,12 @@ fn print_completions<G: Generator>(gen: G, cmd: &mut Command) {
     generate(gen, cmd, cmd.get_name().to_string(), &mut io::stdout());
 }
 
-fn print_tags() -> Result<()> {
-    println!("Available Tags:");
-    // TODO: Code to retrieve and print available tags goes here
-    Ok(())
+fn print_tags() {
+    println!("{}\n", "Available Tags:".purple());
+    println!("{}", TAGS
+        .iter()
+        .map(String::as_str)
+        .collect::<Vec<&str>>()
+        .join("\n")
+    );
 }
-
-
-
-

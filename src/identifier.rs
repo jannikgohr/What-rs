@@ -48,8 +48,7 @@ pub fn identify_text(text: String, matches: &mut Vec<Match>, filter: &Filter) {
         .par_iter()
         .enumerate()
         .for_each(|(i, r)| {
-            // Check the filter for the current pattern
-            if r.rarity < filter.min || r.rarity > filter.max {
+            if filter.gets_excluded(&r) {
                 return;
             }
 
