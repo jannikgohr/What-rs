@@ -8,12 +8,14 @@ use crate::filter::Filter;
 use crate::format::{get_format, output, Options, OutputFormat};
 use crate::identifier::{identify, Match};
 use crate::sorter::Sorter;
+use crate::regex_pd::TAGS;
 use anyhow::Result;
 use clap::{Arg, Command};
 use clap_complete::aot::{generate, Generator};
 use clap_complete::Shell::{Bash, Elvish, Fish, PowerShell, Zsh};
 use human_panic::setup_panic;
 use std::{io, process};
+use colored::Colorize;
 
 const HELP_TEMPLATE_FORMAT: &str = "\
 {before-help}{name} {version}
@@ -131,7 +133,7 @@ fn main() {
     }
 
     if cli_matches.get_flag("tags") {
-        print_tags().unwrap();
+        print_tags();
         process::exit(0);
     }
 
@@ -177,10 +179,14 @@ fn print_completions<G: Generator>(gen: G, cmd: &mut Command) {
     generate(gen, cmd, cmd.get_name().to_string(), &mut io::stdout());
 }
 
-fn print_tags() -> Result<()> {
-    println!("Available Tags:");
-    // TODO: Code to retrieve and print available tags goes here
-    Ok(())
+fn print_tags() {
+    println!("{}\n", "Available Tags:".purple());
+    println!("{}", TAGS
+        .iter()
+        .map(String::as_str)
+        .collect::<Vec<&str>>()
+        .join("\n")
+    );
 }
 
 

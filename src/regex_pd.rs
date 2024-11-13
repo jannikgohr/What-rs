@@ -1,3 +1,4 @@
+use std::collections::HashSet;
 use serde::Serialize;
 use regex::Regex;
 use once_cell::sync::Lazy;
@@ -35,3 +36,10 @@ const _2: [Lazy<Regex>; 0] = []; // so rust-analyzer won't complain about unused
 // this is `pub static REGEX_NO_ANCHOR: [Lazy<Regex>; 129] = ...`
 include!(concat!(env!("OUT_DIR"), "/regex_data.rs"));
 
+pub(crate) static TAGS: Lazy<HashSet<String>> = Lazy::new(|| {
+    let mut tag_set = HashSet::new();
+    for pattern in PATTERN_DATA.iter() {
+        tag_set.extend(pattern.tags.iter().map(|&tag| tag.to_string()));
+    }
+    tag_set
+});
