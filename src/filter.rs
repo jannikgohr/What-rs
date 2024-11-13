@@ -1,11 +1,12 @@
-use crate::regex_pd::TAGS;
+use std::collections::HashSet;
+use crate::regex_pd::{PatternData, TAGS};
 
 pub struct Filter {
     pub(crate) min: f32,
     pub(crate) max: f32,
     pub(crate) borderless: bool,
-    pub(crate) include: Vec<String>,
-    pub(crate) exclude: Vec<String>,
+    pub(crate) include: HashSet<String>,
+    pub(crate) exclude: HashSet<String>,
 }
 
 impl Filter {
@@ -42,6 +43,21 @@ impl Filter {
         }
         self
     }
+
+    pub fn gets_excluded(&self, pattern_data: &PatternData) -> bool {
+        if pattern_data.rarity < self.min || pattern_data.rarity > self.max {
+            return true
+        }
+        if pattern_data.tags.iter()
+            .any(|&t| self.exclude.contains(&t.to_lowercase())) {
+            return true;
+        }
+        if !self.include.is_empty() && !pattern_data.tags.iter()
+            .any(|&t| self.include.contains(&t.to_lowercase())) {
+            return true
+        }
+        false
+    }
 }
 
 impl Default for Filter {
@@ -50,17 +66,21 @@ impl Default for Filter {
             min: 0.1,
             max: 1.0,
             borderless: true,
-            include: vec![],
-            exclude: vec![],
+            include: HashSet::new(),
+            exclude: HashSet::new(),
         }
     }
 }
 
-fn ensure_tags_exist(tags: &Vec<String>) {
-    let invalid_tags = tags.iter().filter(|&t| !TAGS.contains(t)).collect::<Vec<&String>>();
-    if !invalid_tags.is_empty() {
-        eprintln!("Invalid tags: {:?}", invalid_tags);
-        std::process::exit(1);
+fn ensure_tags_exist(tags: &HashSet<String>) {
+    if !tags.is_subset(&TAGS) {
+        let invalid_tags = tags.iter()
+            .filter(|&t| !TAGS.contains(t))
+            .collect::<Vec<&String>>();
+        if !invalid_tags.is_empty() {
+            eprintln!("Invalid tags: {:?}", invalid_tags);
+            std::process::exit(1);
+        }
     }
 }
 

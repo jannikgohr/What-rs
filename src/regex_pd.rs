@@ -39,7 +39,7 @@ include!(concat!(env!("OUT_DIR"), "/regex_data.rs"));
 pub(crate) static TAGS: Lazy<HashSet<String>> = Lazy::new(|| {
     let mut tag_set = HashSet::new();
     for pattern in PATTERN_DATA.iter() {
-        tag_set.extend(pattern.tags.iter().map(|&tag| tag.to_string().to_lowercase()));
+        tag_set.extend(pattern.tags.iter().map(|&tag| tag.to_lowercase()));
     }
     tag_set
 });
