@@ -50,6 +50,16 @@ jobs:
           args: "--locked --release"
           strip: true
 
+      - name: Build MSI installer (Windows only)
+        if: matrix.platform.os_name == 'Windows-x86_64'
+        run: |
+          # Install WiX Toolset using .NET CLI
+          dotnet tool install --global wix --version 5.0.*
+          # Build the MSI installer using Wix Toolset
+          wix build packages/wix/windows-installer.wxs -o target/wix/what-rs-amd64-windows-installer.msi -d EXE_FILE_PATH=target/${{ matrix.platform.target }}/release/what-rs.exe
+          # Generate SHA-256 checksum for the MSI file
+          shasum -a 256 target//wix/what-rs-amd64-windows-installer.msi | cut -d ' ' -f 1 > target/wix/what-rs-amd64-windows-installer.msi.sha256
+
       - name: Rename binary (linux and macos)
         run: mv target/${{ matrix.platform.target }}/release/what-rs target/${{ matrix.platform.target }}/release/${{ matrix.platform.bin }}
         if: matrix.platform.os_name != 'Windows-x86_64'
@@ -57,16 +67,6 @@ jobs:
       - name: Rename binary (windows)
         run: mv target/${{ matrix.platform.target }}/release/what-rs.exe target/${{ matrix.platform.target }}/release/${{ matrix.platform.bin }}
         if: matrix.platform.os_name == 'Windows-x86_64'
-
-      - name: Build MSI installer (Windows only)
-        if: matrix.platform.os_name == 'Windows-x86_64'
-        run: |
-          # Install WiX Toolset using .NET CLI
-          dotnet tool install --global wix --version 5.0.*
-          # Build the MSI installer using Wix Toolset
-          wix build packages/wix/windows-installer.wxs -o target/wix/what-rs-amd64-windows-installer.msi -d EXE_FILE_PATH=target/${{ matrix.platform.target }}/release/${{ matrix.platform.bin }}
-          # Generate SHA-256 checksum for the MSI file
-          shasum -a 256 target//wix/what-rs-amd64-windows-installer.msi | cut -d ' ' -f 1 > target/wix/what-rs-amd64-windows-installer.msi.sha256
 
       - name: Generate SHA-256
         run: shasum -a 256 target/${{ matrix.platform.target }}/release/${{ matrix.platform.bin }} | cut -d ' ' -f 1 > target/${{ matrix.platform.target }}/release/${{ matrix.platform.bin }}.sha256
