@@ -9,7 +9,6 @@ use crate::format::{get_format, output, Options, OutputFormat};
 use crate::identifier::{identify, Match};
 use crate::sorter::Sorter;
 use crate::regex_pd::TAGS;
-use anyhow::Result;
 use clap::{Arg, Command};
 use clap_complete::aot::{generate, Generator};
 use clap_complete::Shell::{Bash, Elvish, Fish, PowerShell, Zsh};
@@ -137,12 +136,26 @@ fn main() {
         process::exit(0);
     }
 
+    let input = cli_matches.get_one::<String>("input").cloned();
+    if input.is_none() {
+        if cli_matches.args_present() {
+            cli().help_template("{usage-heading} {usage}\n\n{all-args}{after-help}")
+                .print_help().unwrap();
+        } else {
+            println!("{} (Version: {})", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"));
+            println!("\n{}", env!("CARGO_PKG_DESCRIPTION"));
+            println!("Made by {}", env!("CARGO_PKG_AUTHORS"));
+            println!("For more information see {}", env!("CARGO_PKG_HOMEPAGE"));
+            eprintln!("\nRun '--help' for usage.");
+        }
+        process::exit(1);
+    }
+
     let filter = Filter::default()
         .rarity(cli_matches.get_one::<String>("rarity").unwrap())
         .borderless(!cli_matches.get_flag("disable-borderless"))
         .include(cli_matches.get_one::<String>("include").unwrap_or(&String::from("")))
         .exclude(cli_matches.get_one::<String>("exclude").unwrap_or(&String::from("")));
-
 
     let mut options: Options = Options {
         format: OutputFormat::DEFAULT,
@@ -150,17 +163,6 @@ fn main() {
 
     options.format = get_format(&cli_matches.get_one::<String>("format"));
 
-    let input = cli_matches.get_one::<String>("input").cloned();
-    if input.is_none() {
-        println!("{} (Version: {})", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"));
-        println!("\n{}", env!("CARGO_PKG_DESCRIPTION"));
-        println!("Made by {}", env!("CARGO_PKG_AUTHORS"));
-        println!("For more information see {}", env!("CARGO_PKG_HOMEPAGE"));
-        eprintln!("\nRun '--help' for usage.");
-        process::exit(1);
-    }
-
-    // Determine if the input is text or a file/directory path
     if let Some(input) = cli_matches.get_one::<String>("input") {
         let mut matches: Vec<Match> = Vec::new();
         identify(input, &mut matches, &filter, cli_matches.get_flag("only_text")).unwrap();
@@ -188,7 +190,3 @@ fn print_tags() {
         .join("\n")
     );
 }
-
-
-
-

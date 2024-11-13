@@ -1,3 +1,5 @@
+use crate::regex_pd::TAGS;
+
 pub struct Filter {
     pub(crate) min: f32,
     pub(crate) max: f32,
@@ -21,16 +23,22 @@ impl Filter {
 
     pub fn include(mut self, include: &String) -> Self {
         if !include.is_empty() {
-            self.include = include.split(",").map(|s| s.to_string()).collect();
-            check_if_tags_exist(&self.include);
+            self.include = include
+                .split(",")
+                .map(|s| s.to_string().to_lowercase())
+                .collect();
+            ensure_tags_exist(&self.include);
         }
         self
     }
 
     pub fn exclude(mut self, exclude: &String) -> Self {
         if !exclude.is_empty() {
-            self.exclude = exclude.split(",").map(|s| s.to_string()).collect();
-            check_if_tags_exist(&self.exclude);
+            self.exclude = exclude
+                .split(",")
+                .map(|s| s.to_string().to_lowercase())
+                .collect();
+            ensure_tags_exist(&self.exclude);
         }
         self
     }
@@ -48,8 +56,12 @@ impl Default for Filter {
     }
 }
 
-fn check_if_tags_exist(tags: &Vec<String>) {
-    println!("Checking if tags: {} exist!", tags.join(", "));
+fn ensure_tags_exist(tags: &Vec<String>) {
+    let invalid_tags = tags.iter().filter(|&t| !TAGS.contains(t)).collect::<Vec<&String>>();
+    if !invalid_tags.is_empty() {
+        eprintln!("Invalid tags: {:?}", invalid_tags);
+        std::process::exit(1);
+    }
 }
 
 pub fn parse_rarity(rarity: &str) -> anyhow::Result<(f32, f32)> {
