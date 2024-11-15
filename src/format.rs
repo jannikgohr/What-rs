@@ -9,6 +9,7 @@ use tabled::settings::Width;
 use tabled::{settings::{object::Rows, style::Style, themes::Colorization, Color}, Table, Tabled};
 
 use terminal_size::{terminal_size, Height as TerminalHeight, Width as TerminalWidth};
+use crate::options::Options;
 
 const MAX_TABLE_WIDTH: usize = 300;
 
@@ -34,10 +35,6 @@ pub enum OutputFormat {
     JSON,
     PRETTY,
     RAW // TODO: implement
-}
-
-pub struct Options {
-    pub format: OutputFormat,
 }
 
 pub fn output(matches: &Vec<Match>, options: &Options) {

@@ -1,3 +1,5 @@
+mod pcap_identifier;
+
 use crate::regex_pd::{PATTERN_DATA, REGEX, REGEX_NO_ANCHOR};
 use crate::Filter;
 use serde::Serialize;
@@ -7,6 +9,7 @@ use std::sync::{Arc, Mutex};
 use once_cell::sync::Lazy;
 use rayon::prelude::*;
 use regex::Regex;
+use crate::options::Options;
 
 #[derive(Debug, Serialize)]
 pub struct Match {
@@ -93,9 +96,9 @@ pub fn identify_text(text: String, matches: &mut Vec<Match>, filter: &Filter) {
     matches.extend(results);
 }
 
-pub fn identify(input: &String, matches: &mut Vec<Match>, filter: &Filter, only_text: bool) -> anyhow::Result<()> {
+pub fn identify(input: &String, matches: &mut Vec<Match>, filter: &Filter, options: &Options) -> anyhow::Result<()> {
     let path = Path::new(input);
-    if !only_text && path.exists() {
+    if !options.only_text && path.exists() {
         if path.is_file() {
             identify_file(path, matches, &filter)?;
         } else if path.is_dir() {
