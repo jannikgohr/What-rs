@@ -1,4 +1,7 @@
+use std::io;
 use clap::{Arg, Command};
+use clap_complete::{generate, Generator};
+use clap_complete::Shell::{Bash, Elvish, Fish, PowerShell, Zsh};
 
 const HELP_TEMPLATE_FORMAT: &str = "\
 {before-help}{name} {version}
@@ -103,4 +106,23 @@ pub fn cli() -> Command {
                 .help("Analyze a pcap file.")
                 .action(clap::ArgAction::SetTrue),
         )
+}
+
+fn print_completions<G: Generator>(gen: G, cmd: &mut Command) {
+    generate(gen, cmd, cmd.get_name().to_string(), &mut io::stdout());
+}
+
+pub fn generate_completions(generator: &String) {
+    let mut cmd = cli();
+    eprintln!("Generating completion file for {generator}...");
+
+    match generator.as_str() {
+        "bash" => print_completions(Bash, &mut cmd),
+        "zsh" => print_completions(Zsh, &mut cmd),
+        "fish" => print_completions(Fish, &mut cmd),
+        "powershell" => print_completions(PowerShell, &mut cmd),
+        "elvish" => print_completions(Elvish, &mut cmd),
+        _ => eprintln!("Unknown shell specified."),
+    }
+    return;
 }

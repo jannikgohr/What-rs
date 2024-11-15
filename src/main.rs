@@ -6,19 +6,17 @@ mod sorter;
 mod options;
 mod cli;
 
-use crate::cli::cli;
+use crate::cli::{cli, generate_completions};
 use crate::filter::Filter;
 use crate::format::{get_format, output, OutputFormat};
 use crate::identifier::{identify, Match};
 use crate::regex_pd::TAGS;
 use crate::sorter::Sorter;
-use clap::Command;
-use clap_complete::aot::{generate, Generator};
-use clap_complete::Shell::{Bash, Elvish, Fish, PowerShell, Zsh};
+
+use crate::options::Options;
 use colored::Colorize;
 use human_panic::setup_panic;
-use std::{io, process};
-use crate::options::Options;
+use std::process;
 
 fn main() {
     setup_panic!();
@@ -29,18 +27,7 @@ fn main() {
 
     let cli_matches = cli().get_matches();
     if let Some(generator) = cli_matches.get_one::<String>("generate") {
-        let mut cmd = cli();
-        eprintln!("Generating completion file for {generator}...");
-
-        match generator.as_str() {
-            "bash" => print_completions(Bash, &mut cmd),
-            "zsh" => print_completions(Zsh, &mut cmd),
-            "fish" => print_completions(Fish, &mut cmd),
-            "powershell" => print_completions(PowerShell, &mut cmd),
-            "elvish" => print_completions(Elvish, &mut cmd),
-            _ => eprintln!("Unknown shell specified."),
-        }
-        return;
+        generate_completions(generator);
     }
 
     if cli_matches.get_flag("tags") {
@@ -92,9 +79,7 @@ fn main() {
     }
 }
 
-fn print_completions<G: Generator>(gen: G, cmd: &mut Command) {
-    generate(gen, cmd, cmd.get_name().to_string(), &mut io::stdout());
-}
+
 
 fn print_tags() {
     println!("{}\n", "Available Tags:".purple());
