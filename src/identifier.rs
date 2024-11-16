@@ -1,4 +1,5 @@
 mod pcap_identifier;
+mod pcapng_identifier;
 
 use crate::regex_pd::{PATTERN_DATA, REGEX, REGEX_NO_ANCHOR};
 use crate::Filter;
@@ -9,6 +10,8 @@ use std::sync::{Arc, Mutex};
 use once_cell::sync::Lazy;
 use rayon::prelude::*;
 use regex::Regex;
+use crate::identifier::pcap_identifier::identify_pcap;
+use crate::identifier::pcapng_identifier::identify_pcapng;
 use crate::options::Options;
 
 #[derive(Debug, Serialize)]
@@ -21,25 +24,33 @@ pub struct Match {
     pub exploit: Option<String>,
 }
 
-pub fn identify_directory(path: &Path, matches: &mut Vec<Match>, filter: &Filter) -> anyhow::Result<()> {
+pub fn identify_directory(path: &Path, matches: &mut Vec<Match>, filter: &Filter, options: &Options) -> anyhow::Result<()> {
     println!("Identifying directory: {:?}", path);
     for entry in fs::read_dir(path)? {
         let entry = entry?;
         let file_path = entry.path();
         if file_path.is_file() {
-            identify_file(&file_path, matches, filter)?;
+            identify_file(&file_path, matches, filter, options)?;
         } else if file_path.is_dir() {
-            identify_directory(&file_path, matches, filter)?;
+            identify_directory(&file_path, matches, filter, options)?;
         }
     }
     Ok(())
 }
 
-pub fn identify_file(path: &Path, matches: &mut Vec<Match>, filter: &Filter) -> anyhow::Result<()> {
+pub fn identify_file(path: &Path, matches: &mut Vec<Match>, filter: &Filter, options: &Options) -> anyhow::Result<()> {
     // TODO: Better error handling
     println!("Identifying file {:?}", path);
-    let content = read_file_to_strings(path).join("\n");
-    identify_text(content, matches, filter);
+
+    if options.pcap {
+        identify_pcap(path, matches, filter, options)?;
+    } else if options.pcapng {
+        identify_pcapng(path, matches, filter, options)?;
+    } else {
+        let content = read_file_to_strings(path).join("\n");
+        identify_text(content, matches, filter);
+    }
+
     Ok(())
 }
 
@@ -100,9 +111,9 @@ pub fn identify(input: &String, matches: &mut Vec<Match>, filter: &Filter, optio
     let path = Path::new(input);
     if !options.only_text && path.exists() {
         if path.is_file() {
-            identify_file(path, matches, &filter)?;
+            identify_file(path, matches, &filter, &options)?;
         } else if path.is_dir() {
-            identify_directory(path, matches, &filter)?;
+            identify_directory(path, matches, &filter, &options)?;
         } else {
             panic!("Input is path but neither file nor directory");
         }
