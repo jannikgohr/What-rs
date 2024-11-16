@@ -25,6 +25,83 @@ pub struct Match {
     pub exploit: Option<String>,
 }
 
+pub struct Identifier {
+    matched_texts: Arc<RwLock<HashSet<String>>>,
+}
+
+impl Identifier {
+
+    pub fn new() -> Identifier {
+        Identifier {
+            matched_texts: Arc::new(RwLock::new(HashSet::new())),
+        }
+    }
+
+    pub fn identify_text(&mut self, text: String, matches: &mut Vec<Match>, filter: &Filter, options: &Options) {
+        let text = Arc::new(text);
+        let matches_arc = Arc::new(Mutex::new(Vec::new()));
+
+        PATTERN_DATA
+            .par_iter()
+            .enumerate()
+            .for_each(|(i, r)| {
+                if filter.gets_excluded(&r) {
+                    return;
+                }
+
+                let re: &Lazy<Regex> = if filter.borderless {
+                    &REGEX_NO_ANCHOR[i]
+                } else {
+                    &REGEX[i]
+                };
+
+                // Find all matches for this pattern
+                for mat in re.find_iter(&text) {
+
+                    let matched_on = mat.as_str().to_string();
+
+                    if !options.allow_duplicates {
+                        if self.matched_texts.read().unwrap().contains(&matched_on) {
+                            continue
+                        } else {
+                            self.matched_texts.write().unwrap().insert(matched_on.clone());
+                        }
+                    }
+
+                    let match_obj = Match {
+                        matched_on,
+                        name: r.name.parse().unwrap(),
+                        rarity: r.rarity,
+                        description: match &r.description {
+                            Some(description) => Some(description.to_string()),
+                            None => None
+                        },
+                        link: match &r.url {
+                            Some(url) => Some(url.to_string()),
+                            None => None
+                        },
+                        exploit: match &r.exploit {
+                            Some(exploit) => Some(exploit.to_string()),
+                            None => None
+                        },
+                    };
+
+                    // Push the match object to the shared vector
+                    let mut matches_lock = matches_arc.lock().unwrap();
+                    matches_lock.push(match_obj);
+                }
+            });
+
+        // Move collected matches from matches_arc to the output vector
+        let results = Arc::try_unwrap(matches_arc)
+            .expect("Failed to unwrap Arc") // We ensure no other thread is holding a reference
+            .into_inner()
+            .expect("Failed to lock Mutex");
+
+        matches.extend(results);
+    }
+}
+
 pub fn identify_directory(path: &Path, matches: &mut Vec<Match>, filter: &Filter, options: &Options) -> anyhow::Result<()> {
     println!("Identifying directory: {:?}", path);
     for entry in fs::read_dir(path)? {
@@ -49,75 +126,10 @@ pub fn identify_file(path: &Path, matches: &mut Vec<Match>, filter: &Filter, opt
         identify_pcapng(path, matches, filter, options)?;
     } else {
         let content = read_file_to_strings(path).join("\n");
-        identify_text(content, matches, filter, options);
+        Identifier::new().identify_text(content, matches, filter, options);
     }
 
     Ok(())
-}
-
-pub fn identify_text(text: String, matches: &mut Vec<Match>, filter: &Filter, options: &Options) {
-    let text = Arc::new(text);
-    let matches_arc = Arc::new(Mutex::new(Vec::new()));
-    let matched_texts = Arc::new(RwLock::new(HashSet::<String>::new()));
-
-    PATTERN_DATA
-        .par_iter()
-        .enumerate()
-        .for_each(|(i, r)| {
-            if filter.gets_excluded(&r) {
-                return;
-            }
-
-            let re: &Lazy<Regex> = if filter.borderless {
-                &REGEX_NO_ANCHOR[i]
-            } else {
-                &REGEX[i]
-            };
-
-            // Find all matches for this pattern
-            for mat in re.find_iter(&text) {
-
-                let matched_on = mat.as_str().to_string();
-
-                if !options.allow_duplicates {
-                    if matched_texts.read().unwrap().contains(&matched_on) {
-                        continue
-                    } else {
-                        matched_texts.write().unwrap().insert(matched_on.clone());
-                    }
-                }
-
-                let match_obj = Match {
-                    matched_on,
-                    name: r.name.parse().unwrap(),
-                    rarity: r.rarity,
-                    description: match &r.description {
-                        Some(description) => Some(description.to_string()),
-                        None => None
-                    },
-                    link: match &r.url {
-                        Some(url) => Some(url.to_string()),
-                        None => None
-                    },
-                    exploit: match &r.exploit {
-                        Some(exploit) => Some(exploit.to_string()),
-                        None => None
-                    },
-                };
-
-                // Push the match object to the shared vector
-                let mut matches_lock = matches_arc.lock().unwrap();
-                matches_lock.push(match_obj);
-            }
-        });
-
-    // Move collected matches from matches_arc to the output vector
-    let results = Arc::try_unwrap(matches_arc)
-        .expect("Failed to unwrap Arc") // We ensure no other thread is holding a reference
-        .into_inner()
-        .expect("Failed to lock Mutex");
-
-    matches.extend(results);
 }
 
 pub fn identify(input: &String, matches: &mut Vec<Match>, filter: &Filter, options: &Options) -> anyhow::Result<()> {
@@ -131,7 +143,7 @@ pub fn identify(input: &String, matches: &mut Vec<Match>, filter: &Filter, optio
             panic!("Input is path but neither file nor directory");
         }
     } else {
-        identify_text(input.to_string(), matches, &filter, &options);
+        Identifier::new().identify_text(input.to_string(), matches, &filter, &options);
     }
 
     Ok(())

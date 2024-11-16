@@ -1,5 +1,5 @@
 use crate::filter::Filter;
-use crate::identifier::{identify_text, Match};
+use crate::identifier::{Identifier, Match};
 use crate::options::Options;
 use pcap_parser::traits::PcapReaderIterator;
 use pcap_parser::*;
@@ -14,14 +14,13 @@ pub(crate) fn identify_pcapng (
 ) -> anyhow::Result<()> {
     println!("identify_pcapng");
     let file = File::open(path)?;
-    let mut num_blocks = 0;
+    let mut identifier = Identifier::new();
     let mut reader = PcapNGReader::new(65536, file).expect("PcapNGReader");
     loop {
         match reader.next() {
             Ok((offset, _block)) => {
-                num_blocks += 1;
                 let content = String::from_utf8_lossy(reader.data()).to_string();
-                identify_text(content, matches, filter, options);
+                identifier.identify_text(content, matches, filter, options);
                 reader.consume(offset);
             },
             Err(PcapError::Eof) => break,
