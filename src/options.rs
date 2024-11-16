@@ -5,4 +5,5 @@ pub struct Options {
     pub verbose: bool,
     pub only_text: bool,
     pub pcap: bool,
+    pub pcapng: bool,
 }

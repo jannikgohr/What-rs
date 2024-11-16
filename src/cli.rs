@@ -100,11 +100,23 @@ pub fn cli() -> Command {
                 .help("Show more information.")
                 .action(clap::ArgAction::SetTrue),
         )
-        .arg(
-            Arg::new("pcap")
-                .long("pcap")
-                .help("Analyze a pcap file.")
-                .action(clap::ArgAction::SetTrue),
+        .subcommand(
+            Command::new("pcapng")
+                .about("Analyze a pcapng file.\nOption of super command apply.")
+                .arg(
+                    Arg::new("input")
+                        .help("pcapng input file.")
+                        .required(true),
+                )
+        )
+        .subcommand(
+            Command::new("pcap")
+                .about("Analyze a pcap file.\nOption of super command apply.")
+                .arg(
+                    Arg::new("input")
+                        .help("pcapng input file.")
+                        .required(true),
+                )
         )
 }
 

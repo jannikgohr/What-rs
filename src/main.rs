@@ -35,20 +35,36 @@ fn main() {
         process::exit(0);
     }
 
-    let input = cli_matches.get_one::<String>("input").cloned();
-    if input.is_none() {
-        if cli_matches.args_present() {
-            cli().help_template("{usage-heading} {usage}\n\n{all-args}{after-help}")
-                .print_help().unwrap();
-        } else {
-            println!("{} (Version: {})", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"));
-            println!("\n{}", env!("CARGO_PKG_DESCRIPTION"));
-            println!("Made by {}", env!("CARGO_PKG_AUTHORS"));
-            println!("For more information see {}", env!("CARGO_PKG_HOMEPAGE"));
-            eprintln!("\nRun '--help' for usage.");
+    let mut pcap = false;
+    let mut pcapng = false;
+
+    let input = match cli_matches.subcommand() {
+        Some(("pcap", sub_matches)) => {
+            pcap = true;
+            sub_matches.get_one::<String>("input").cloned()
         }
-        process::exit(1);
-    }
+        Some(("pcapng", sub_matches)) => {
+            pcapng = true;
+            sub_matches.get_one::<String>("input").cloned()
+        }
+        _ => {
+            let input = cli_matches.get_one::<String>("input").cloned();
+            if input.is_none() {
+                if cli_matches.args_present() {
+                    cli().help_template("{usage-heading} {usage}\n\n{all-args}{after-help}")
+                        .print_help().unwrap();
+                } else {
+                    println!("{} (Version: {})", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"));
+                    println!("\n{}", env!("CARGO_PKG_DESCRIPTION"));
+                    println!("Made by {}", env!("CARGO_PKG_AUTHORS"));
+                    println!("For more information see {}", env!("CARGO_PKG_HOMEPAGE"));
+                    eprintln!("\nRun '--help' for usage.");
+                }
+                process::exit(1);
+            }
+            input
+        }
+    };
 
     let filter = Filter::default()
         .rarity(cli_matches.get_one::<String>("rarity").unwrap())
@@ -56,18 +72,21 @@ fn main() {
         .include(cli_matches.get_one::<String>("include").unwrap_or(&String::from("")))
         .exclude(cli_matches.get_one::<String>("exclude").unwrap_or(&String::from("")));
 
+
+
     let mut options: Options = Options {
         format: OutputFormat::DEFAULT,
         verbose: cli_matches.get_flag("verbose"),
         only_text: cli_matches.get_flag("only_text"),
-        pcap: cli_matches.get_flag("pcap"),
+        pcap,
+        pcapng,
     };
 
     options.format = get_format(&cli_matches.get_one::<String>("format"));
 
-    if let Some(input) = cli_matches.get_one::<String>("input") {
+    if let Some(input) = input {
         let mut matches: Vec<Match> = Vec::new();
-        identify(input, &mut matches, &filter, &options).unwrap();
+        identify(&input, &mut matches, &filter, &options).unwrap();
         Sorter::default()
             .key(cli_matches.get_one::<String>("key").unwrap())
             .reverse(cli_matches.get_flag("reverse"))
