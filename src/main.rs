@@ -78,6 +78,7 @@ fn main() {
         format: OutputFormat::DEFAULT,
         verbose: cli_matches.get_flag("verbose"),
         only_text: cli_matches.get_flag("only_text"),
+        allow_duplicates: cli_matches.get_flag("allow-duplicates"),
         pcap,
         pcapng,
     };
@@ -91,7 +92,8 @@ fn main() {
             .key(cli_matches.get_one::<String>("key").unwrap())
             .reverse(cli_matches.get_flag("reverse"))
             .sort(&mut matches);
-        output(&matches, &options)
+        output(&matches, &options);
+        // println!("Found {} matches.", matches.len());
     } else {
         eprintln!("Input as text or file/directory path expected. Run '--help' for usage.");
         process::exit(1);

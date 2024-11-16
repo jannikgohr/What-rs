@@ -1,12 +1,13 @@
 mod pcap;
 mod pcapng;
 
+use std::collections::HashSet;
 use crate::regex_pd::{PATTERN_DATA, REGEX, REGEX_NO_ANCHOR};
 use crate::Filter;
 use serde::Serialize;
 use std::fs;
 use std::path::Path;
-use std::sync::{Arc, Mutex};
+use std::sync::{Arc, Mutex, RwLock};
 use once_cell::sync::Lazy;
 use rayon::prelude::*;
 use regex::Regex;
@@ -48,15 +49,16 @@ pub fn identify_file(path: &Path, matches: &mut Vec<Match>, filter: &Filter, opt
         identify_pcapng(path, matches, filter, options)?;
     } else {
         let content = read_file_to_strings(path).join("\n");
-        identify_text(content, matches, filter);
+        identify_text(content, matches, filter, options);
     }
 
     Ok(())
 }
 
-pub fn identify_text(text: String, matches: &mut Vec<Match>, filter: &Filter) {
+pub fn identify_text(text: String, matches: &mut Vec<Match>, filter: &Filter, options: &Options) {
     let text = Arc::new(text);
     let matches_arc = Arc::new(Mutex::new(Vec::new()));
+    let matched_texts = Arc::new(RwLock::new(HashSet::<String>::new()));
 
     PATTERN_DATA
         .par_iter()
@@ -74,8 +76,19 @@ pub fn identify_text(text: String, matches: &mut Vec<Match>, filter: &Filter) {
 
             // Find all matches for this pattern
             for mat in re.find_iter(&text) {
+
+                let matched_on = mat.as_str().to_string();
+
+                if !options.allow_duplicates {
+                    if matched_texts.read().unwrap().contains(&matched_on) {
+                        continue
+                    } else {
+                        matched_texts.write().unwrap().insert(matched_on.clone());
+                    }
+                }
+
                 let match_obj = Match {
-                    matched_on: mat.as_str().to_string(),
+                    matched_on,
                     name: r.name.parse().unwrap(),
                     rarity: r.rarity,
                     description: match &r.description {
@@ -118,7 +131,7 @@ pub fn identify(input: &String, matches: &mut Vec<Match>, filter: &Filter, optio
             panic!("Input is path but neither file nor directory");
         }
     } else {
-        identify_text(input.to_string(), matches, &filter);
+        identify_text(input.to_string(), matches, &filter, &options);
     }
 
     Ok(())

@@ -88,6 +88,12 @@ pub fn cli() -> Command {
                 .help("Filter by key name."),
         )
         .arg(
+            Arg::new("allow-duplicates")
+                .long("allow-duplicates")
+                .help("Allow duplicates of matched text and match objects.")
+                .action(clap::ArgAction::SetTrue),
+        )
+        .arg(
             Arg::new("generate")
                 .long("generate")
                 .help("Generate a shell completion file for the specified shell")

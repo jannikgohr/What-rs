@@ -10,7 +10,7 @@ pub(crate) fn identify_pcapng (
     path: &Path,
     matches: &mut Vec<Match>,
     filter: &Filter,
-    _options: &Options
+    options: &Options
 ) -> anyhow::Result<()> {
     println!("identify_pcapng");
     let file = File::open(path)?;
@@ -21,7 +21,7 @@ pub(crate) fn identify_pcapng (
             Ok((offset, _block)) => {
                 num_blocks += 1;
                 let content = String::from_utf8_lossy(reader.data()).to_string();
-                identify_text(content, matches, filter);
+                identify_text(content, matches, filter, options);
                 reader.consume(offset);
             },
             Err(PcapError::Eof) => break,
