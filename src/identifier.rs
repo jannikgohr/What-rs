@@ -1,5 +1,5 @@
-mod pcap_identifier;
-mod pcapng_identifier;
+mod pcap;
+mod pcapng;
 
 use crate::regex_pd::{PATTERN_DATA, REGEX, REGEX_NO_ANCHOR};
 use crate::Filter;
@@ -10,8 +10,8 @@ use std::sync::{Arc, Mutex};
 use once_cell::sync::Lazy;
 use rayon::prelude::*;
 use regex::Regex;
-use crate::identifier::pcap_identifier::identify_pcap;
-use crate::identifier::pcapng_identifier::identify_pcapng;
+use crate::identifier::pcap::identify_pcap;
+use crate::identifier::pcapng::identify_pcapng;
 use crate::options::Options;
 
 #[derive(Debug, Serialize)]
