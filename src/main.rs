@@ -87,7 +87,9 @@ fn main() {
             .reverse(cli_matches.get_flag("reverse"))
             .sort(&mut matches);
         output(&matches, &options);
-        // println!("Found {} matches.", matches.len());
+        if options.verbose {
+            println!("Found {} matches.", matches.len());
+        }
     } else {
         eprintln!("Input as text or file/directory path expected. Run '--help' for usage.");
         process::exit(1);
