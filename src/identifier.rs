@@ -154,7 +154,6 @@ pub(crate) fn to_human_readable_vec(b_string: Vec<u8>) -> Vec<String> {
     let mut printable_text: Vec<String> = Vec::new();
     let min_human_text_len = 4;
 
-
     // This struct is used to check if our chunk division divided a human-readable sequence
     // If Texts[n].ends_with_valid_utf8 && Texts[n+1].starts_with_valid_utf8 -> stitch Texts together
     struct Paragraph {
@@ -249,43 +248,6 @@ pub(crate) fn to_human_readable_vec(b_string: Vec<u8>) -> Vec<String> {
             printable_text.push(paragraph.sentences.last().unwrap().clone());
         }
     }
-
-
-
-    /*
-    let mut use_current_buffer = false;
-    let mut buffer: Vec<u8> = Vec::new();
-
-    for character in b_string {
-        if character.is_ascii_graphic() {
-            // Doesn't consider whitespace as a graphic!
-            use_current_buffer = true;
-            buffer.push(character);
-        } else if use_current_buffer {
-            // If the char isn't ascii graphic, that means this is the end for our string which we are interested in
-            // string with length less than 4 most likely won't be of our use.
-            // If it has length more than 4, then push it to our `printable_text`
-            if buffer.len() >= 4 {
-                printable_text.push(
-                    String::from_utf8(buffer.clone()).expect("failed to convert u8 to string"),
-                );
-            }
-
-            // Clear the buffer so that current contents of it won't affect the next string.
-            buffer.clear();
-            // We set this to false because we don't want to use buffer until we get a ascii graphic!
-            use_current_buffer = false;
-        }
-    }
-
-    printable_text.push(String::from_utf8(buffer).expect("failed to convert u8 to string"));
-
-     */
-
-
-
-
-    // printable_text.push(String::from_utf8(b_string).unwrap());
 
     printable_text
 }
