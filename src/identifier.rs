@@ -197,6 +197,11 @@ pub(crate) fn to_human_readable_vec(b_string: Vec<u8>) -> Vec<String> {
                     use_current_buffer = false;
                 }
             }
+            if buffer.len() >= min_human_text_len {
+                paragraph.sentences.push(
+                    String::from_utf8(buffer).expect("failed to convert u8 to string")
+                );
+            }
             paragraph
         })
         .collect::<Vec<Paragraph>>();
