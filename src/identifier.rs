@@ -1,5 +1,4 @@
 mod pcap;
-mod pcapng;
 
 use std::collections::HashSet;
 use crate::regex_pd::{PATTERN_DATA, REGEX, REGEX_NO_ANCHOR};
@@ -11,8 +10,7 @@ use std::sync::{Arc, Mutex, RwLock};
 use once_cell::sync::Lazy;
 use rayon::prelude::*;
 use regex::Regex;
-use crate::identifier::pcap::identify_pcap;
-use crate::identifier::pcapng::identify_pcapng;
+use crate::identifier::pcap::identify_pcapng;
 use crate::options::Options;
 
 #[derive(Debug, Serialize)]
@@ -120,9 +118,7 @@ pub fn identify_file(path: &Path, matches: &mut Vec<Match>, filter: &Filter, opt
     // TODO: Better error handling
     println!("Identifying file {:?}", path);
 
-    if options.pcap {
-        identify_pcap(path, matches, filter, options)?;
-    } else if options.pcapng {
+    if options.pcapng {
         identify_pcapng(path, matches, filter, options)?;
     } else {
         let content = read_file_to_strings(path).join("\n");
@@ -151,13 +147,15 @@ pub fn identify(input: &String, matches: &mut Vec<Match>, filter: &Filter, optio
 
 fn read_file_to_strings(filename: &Path) -> Vec<String> {
     let file = fs::read(filename).expect("File not found");
+    to_human_readable_vec(file)
+}
 
+pub(crate) fn to_human_readable_vec(b_string: Vec<u8>) -> Vec<String> {
     let mut printable_text: Vec<String> = Vec::new();
     let mut buffer: Vec<u8> = Vec::new();
     let mut use_current_buffer = false;
 
-    //we only need the human-readable strings from the file.
-    for character in file {
+    for character in b_string {
         if character.is_ascii_graphic() {
             // Doesn't consider whitespace as a graphic!
             use_current_buffer = true;

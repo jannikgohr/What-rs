@@ -35,14 +35,9 @@ fn main() {
         process::exit(0);
     }
 
-    let mut pcap = false;
     let mut pcapng = false;
 
     let input = match cli_matches.subcommand() {
-        Some(("pcap", sub_matches)) => {
-            pcap = true;
-            sub_matches.get_one::<String>("input").cloned()
-        }
         Some(("pcapng", sub_matches)) => {
             pcapng = true;
             sub_matches.get_one::<String>("input").cloned()
@@ -79,7 +74,6 @@ fn main() {
         verbose: cli_matches.get_flag("verbose"),
         only_text: cli_matches.get_flag("only_text"),
         allow_duplicates: cli_matches.get_flag("allow-duplicates"),
-        pcap,
         pcapng,
     };
 
