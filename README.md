@@ -15,7 +15,7 @@ A reimplementation of the popular [pyWhat](https://github.com/bee-san/pyWhat/)
 
 ## 🤔 `What` is this?
 
-![Demo GIF](img/demo.gif)
+![Demo GIF](https://github.com/jannikgohr/what-rs/blob/main/img/demo.gif)
 
 Imagine this: You come across some mysterious text 🧙‍♂️ `0x52908400098527886E0F7030069857D2E4169EE7` or `dQw4w9WgXcQ` and you wonder what it is. What do you do?
 

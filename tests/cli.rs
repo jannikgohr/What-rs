@@ -122,3 +122,25 @@ fn dont_find_url_if_unrelated_in_included() -> Result<(), Box<dyn std::error::Er
 
     Ok(())
 }
+
+#[test]
+fn dont_find_url_if_too_rare() -> Result<(), Box<dyn std::error::Error>> {
+    let mut cmd = Command::cargo_bin("what-rs")?;
+    cmd.arg("dQw4w9WgXcQ");
+    cmd.assert()
+        .success()
+        .stdout(predicate::str::contains("YouTube Video ID").not());
+
+    Ok(())
+}
+
+#[test]
+fn find_url_if_not_too_rare() -> Result<(), Box<dyn std::error::Error>> {
+    let mut cmd = Command::cargo_bin("what-rs")?;
+    cmd.arg("-r").arg("0:1").arg("dQw4w9WgXcQ");
+    cmd.assert()
+        .success()
+        .stdout(predicate::str::contains("YouTube Video ID"));
+
+    Ok(())
+}
