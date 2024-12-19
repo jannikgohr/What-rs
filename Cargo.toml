@@ -1,6 +1,6 @@
 [package]
 name = "what-rs"
-version = "0.4.0"
+version = "0.4.1"
 edition = "2021"
 authors = ["Jannik Gohr <JannikG-Dev@pm.me>"]
 description = """Identify what something is!
@@ -9,7 +9,7 @@ homepage = "https://github.com/jannikgohr/what-rs"
 repository = "https://github.com/jannikgohr/what-rs"
 license = "MIT OR Apache-2.0"
 readme = "README.md"
-exclude = ["/.github", "/.idea", "tests", "packages"]
+exclude = ["/.github", "/.idea", "tests", "packages", "img"]
 keywords = ["regex", "pattern-matching", "text-analysis", "identifier", "CLI"]
 categories = ["command-line-utilities", "text-processing"]
 
